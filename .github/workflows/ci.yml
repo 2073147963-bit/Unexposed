@@ -23,11 +23,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # 先 build：Next 16 的 PageProps 等全局类型由 typegen 在构建时生成
+      - name: Production build
+        run: pnpm build
+
       - name: Typecheck
         run: pnpm typecheck
 
       - name: Unit tests
         run: pnpm test
-
-      - name: Production build
-        run: pnpm build
