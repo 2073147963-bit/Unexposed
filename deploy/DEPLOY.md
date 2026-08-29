@@ -52,7 +52,7 @@ pnpm start          # 默认 3000 端口；PORT=8080 pnpm start 可换端口
 # 服务器安装 Ollama 后：
 ollama pull bge-m3 && ollama pull qwen2.5:7b && ollama pull qwen2.5vl:7b
 # 重建风格语料索引（一次性）：
-node scripts/build-index.mjs
+node scripts/build-index.mjs <语料文本路径>
 # .env.local 留空 LLM_API_KEY 即自动走 Ollama
 pnpm build && pnpm start
 ```

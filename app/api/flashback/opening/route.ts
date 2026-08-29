@@ -1,5 +1,6 @@
 import { complete } from "@/lib/ai/provider";
 import { buildSystemPrompt, type PhotoContext } from "@/lib/ai/style";
+import { OPENING_LIMITS, clientIp, rateLimit, readJsonWithLimit } from "@/lib/api/guard";
 
 interface OpeningRequest {
   photoContext?: {
@@ -21,12 +22,17 @@ const TRIGGER: Record<"zh" | "en", string> = {
 // 预生成开场独白（非流式）。由封存 / 进详情页时后台调用，结果缓存进 IndexedDB，
 // 闪回打开即读缓存秒开，不再现场等模型。
 export async function POST(request: Request) {
-  let body: OpeningRequest;
-  try {
-    body = (await request.json()) as OpeningRequest;
-  } catch {
-    return Response.json({ error: "Invalid request body." }, { status: 400 });
+  const limited = rateLimit(clientIp(request), OPENING_LIMITS);
+  if (!limited.ok) {
+    return Response.json(
+      { error: limited.message },
+      { status: 429, headers: { "Retry-After": String(limited.retryAfter ?? 60) } },
+    );
   }
+
+  const parsed = await readJsonWithLimit<OpeningRequest>(request, 65_536);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.body;
 
   const language: "zh" | "en" = body?.language === "en" ? "en" : "zh";
   const safePhotoContext: PhotoContext = {

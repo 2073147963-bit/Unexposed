@@ -68,14 +68,28 @@ async function call(
   stream: boolean,
   opts: Options,
 ): Promise<Response> {
-  const res = await fetch(`${LLM_BASE_URL}/chat/completions`, {
-    method: "POST",
-    headers: requestHeaders(),
-    body: JSON.stringify(requestBody(model, messages, stream, opts)),
-  });
+  const timeoutMs = Number(process.env.AI_TIMEOUT_MS || 120_000);
+  let res: Response;
+  try {
+    res = await fetch(`${LLM_BASE_URL}/chat/completions`, {
+      method: "POST",
+      headers: requestHeaders(),
+      body: JSON.stringify(requestBody(model, messages, stream, opts)),
+      // 上游超时：避免异常请求长期占用连接（思考模型正常耗时约 10–40s，上限放宽到 2 分钟）。
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+  } catch (err) {
+    if (err instanceof Error && err.name === "TimeoutError") {
+      throw new Error(`模型响应超时（${Math.round(timeoutMs / 1000)}s），请稍后再试。`);
+    }
+    throw new Error("无法连接模型服务，请检查网络。");
+  }
   if (!res.ok) {
-    const detail = await res.text().catch(() => "");
-    throw new Error(`模型返回 ${res.status}：${detail.slice(0, 500)}`);
+    // 不把上游错误体透传到日志或客户端（其中可能回显用户内容）；仅记录状态码。
+    console.error(`上游模型返回错误：status=${res.status} model=${model}`);
+    if (res.status === 401) throw new Error("模型服务鉴权失败，请检查 API Key 配置。");
+    if (res.status === 429) throw new Error("模型服务限流中，请稍后再试。");
+    throw new Error(`模型服务返回错误（${res.status}），请稍后再试。`);
   }
   return res;
 }

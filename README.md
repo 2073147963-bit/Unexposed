@@ -2,11 +2,31 @@
 
 > **把照片封存成胶卷，让今天的解释在未来重新显影。**
 
+[![在线体验](https://img.shields.io/badge/%E5%9C%A8%E7%BA%BF%E4%BD%93%E9%AA%8C-APP-2545FF)](https://unexposed-memory.windy-betta-8990.chatgpt.site)
+[![演示视频](https://img.shields.io/badge/%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91-MP4-d6442e)](./deliverables/UNEXPOSED-demo.mp4)
+[![License: MIT](https://img.shields.io/badge/License-MIT-8d76a8)](./LICENSE)
+![Topic: shenicest-fission](https://img.shields.io/badge/Topic-shenicest__fission-5C6BB0)
+
 Unexposed 是一款本地优先的个人影像记忆应用。它不鼓励用户无限囤积照片，而是要求每卷只选择 **3 张**，为它们留下当下的说明并完成一次有仪式感的封存。未来再次打开胶卷时，用户可以重新回答“它现在对我意味着什么”，让同一张照片保留多个时间版本；也可以进入 AI“闪回”对话，从照片、旧说明和用户的叙述中继续追问，最终把有价值的内容写回照片。
 
-![Unexposed 项目海报 · 主视觉](./poster-mind.png)
+**核心闭环：** 创建胶卷（恰好三张照片）→ 写下当下解释 → 封存为不可覆盖的历史版本 → 时间过去 → 重新显影 / AI 闪回追问 → 有价值的理解写回照片。
 
-![Unexposed 项目海报 · 概念篇](./poster_2.png)
+| 胶卷桌面 | 闪回对话 · 多声部争执 | 对话归档 |
+|---|---|---|
+| ![胶卷桌面](./screenshots/desk.webp) | ![闪回对话](./screenshots/flashback.webp) | ![对话归档](./screenshots/archive.webp) |
+
+![Unexposed 主海报](./poster-mind.webp)
+
+## 参赛提交信息
+
+- **赛道：** 软件应用赛道——滴水穿石
+- **作品名称：** Unexposed / 未显影
+- **Slogan：** 把照片封存成胶卷，让今天的解释在未来重新显影。
+- **GitHub 仓库：** https://github.com/2073147963-bit/Unexposed
+- **Topic：** `shenicest-fission`
+- **在线体验：** https://unexposed-memory.windy-betta-8990.chatgpt.site
+- **演示视频：** [`deliverables/UNEXPOSED-demo.mp4`](./deliverables/UNEXPOSED-demo.mp4)（3 分 03 秒，1080p）
+- **团队成员与分工：** 待补充（单人参赛）
 
 ## 作品描述
 
@@ -60,7 +80,7 @@ AI 负责读图、召回相关表达、组织追问和提炼对话；用户决�
 - **样式与交互：** Tailwind CSS 4、Framer Motion
 - **空间与物理：** Three.js、React Three Fiber、Drei、Matter.js
 - **本地数据：** Dexie + IndexedDB
-- **AI：** OpenAI 兼容 Chat Completions 接口；默认本地 Ollama，可选云端兼容服务
+- **AI：** OpenAI 兼容 Chat Completions 接口。公网部署默认使用智谱 **GLM-5.3-Flash**；本地运行可配置 Ollama（`qwen2.5:7b` 等）
 - **本地模型默认值：** `qwen2.5:7b`（对话）、`qwen2.5vl:7b`（视觉）、`bge-m3`（检索向量）
 - **输入能力：** File API、MediaRecorder、浏览器 SpeechRecognition（按浏览器支持情况启用）
 
@@ -74,14 +94,14 @@ AI 负责读图、召回相关表达、组织追问和提炼对话；用户决�
    └─ OpenAI 兼容云端服务（可选）
 ```
 
-AI 相关接口位于 `app/api/flashback/`。对话采用流式响应；读图结果、开场文本和对话记录会在本地缓存。公开提交目录使用空检索索引，不包含授权尚未确认的研究语料；索引或 embedding 模型不可用时会降级，不阻塞基础体验。
+AI 相关接口位于 `app/api/flashback/`。对话采用流式响应；读图结果、开场文本和对话记录会在本地缓存。公开提交目录使用空检索索引，不包含授权尚未确认的研究语料；索引或 embedding 模型不可用时会降级，不阻塞基础体验。使用自有语料构建索引：`node scripts/build-index.mjs <语料文本路径>`（详见 `data/README.md`）。
 
 ## 数据安全与隐私说明
 
 - 胶卷、照片 Blob、说明、版本和对话默认保存在当前浏览器的 IndexedDB，不会因为使用核心功能而自动上传到业务服务器。
 - 使用本地 Ollama 时，AI 请求发送到本机配置的 Ollama 地址。使用云端兼容服务时，为完成读图或对话，相关照片内容、说明和对话上下文会发送给所配置的第三方模型服务。
 - API Key 仅从服务端环境变量读取，不应提交到仓库；`.env.local` 已列入忽略规则。
-- 清除浏览器站点数据、无痕窗口关闭、浏览器重装或设备损坏都可能导致本地记录丢失。目前尚未实现导入、导出、加密备份和跨设备同步。
+- 清除浏览器站点数据、无痕窗口关闭、浏览器重装或设备损坏都可能导致本地记录丢失。已支持在「数据」菜单中手动导出、导入与清空；暂不支持加密备份、自动云同步和无感跨设备同步。
 - 录音和语音识别能力受浏览器权限及实现影响。演示前应确认权限；不要使用包含未授权人物、隐私信息或敏感内容的照片。
 - 当前项目面向产品原型验证，不应宣称具备医疗、心理治疗、数字遗产托管或长期备份能力。
 - 桌面右上角「数据」菜单支持一键**导出全量备份**（JSON，含照片与对话，内嵌 base64）、**导入恢复**（按 ID 合并）与**清空全部本地数据**（双重确认）。云端模式下首次进入应用会弹出会话级授权提示，可选择「仅本地浏览」跳过所有 AI 调用；上传的照片会自动压缩（长边 2048px）。
@@ -174,9 +194,9 @@ Dockerfile / vercel.json / deploy/  部署配置与说明
 
 ## 后续计划
 
-- 自动化测试、无障碍审计与独立 lint 脚本。
-- 备份文件的加密与自动云端同步（当前为手动导出 / 导入 JSON）。
-- 公网部署前的完整安全加固（严格 CSP、API 速率限制）。
+- 浏览器端端到端测试（Playwright）与无障碍审计。
+- 备份文件的加密与自动云同步（当前为手动导出 / 导入 JSON）。
+- 公网部署的严格 CSP，以及多实例部署下基于共享存储的限流与额度。
 
 ---
 

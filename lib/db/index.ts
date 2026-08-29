@@ -88,6 +88,13 @@ export function getDatabase() {
   return database;
 }
 
+// 完整删除数据库并重置模块级句柄：清空数据后无需刷新页面即可重新打开新库。
+export async function deleteDatabase(): Promise<void> {
+  const instance = getDatabase();
+  await instance.delete();
+  database = undefined;
+}
+
 export async function getActiveDraft() {
   return getDatabase()
     .rolls.where("status")

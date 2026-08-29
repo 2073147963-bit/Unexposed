@@ -1,4 +1,5 @@
 import { complete } from "@/lib/ai/provider";
+import { SUMMARIZE_LIMITS, clientIp, rateLimit, readJsonWithLimit } from "@/lib/api/guard";
 import type { ConversationMessage } from "@/lib/types";
 
 interface SummarizeRequest {
@@ -7,14 +8,21 @@ interface SummarizeRequest {
 
 // 把一段闪回对话提炼成一条精炼的照片说明（写入 reflection 前使用）。
 export async function POST(request: Request) {
-  let body: SummarizeRequest;
-  try {
-    body = (await request.json()) as SummarizeRequest;
-  } catch {
-    return Response.json({ error: "Invalid request body." }, { status: 400 });
+  const limited = rateLimit(clientIp(request), SUMMARIZE_LIMITS);
+  if (!limited.ok) {
+    return Response.json(
+      { error: limited.message },
+      { status: 429, headers: { "Retry-After": String(limited.retryAfter ?? 60) } },
+    );
   }
 
-  const messages = Array.isArray(body?.messages) ? body.messages : [];
+  const parsed = await readJsonWithLimit<SummarizeRequest>(request, 262_144);
+  if (!parsed.ok) return parsed.response;
+
+  const messages = Array.isArray(parsed.body?.messages) ? parsed.body.messages : [];
+  if (messages.length > 80 || messages.some((m) => typeof m?.content !== "string" || m.content.length > 8000)) {
+    return Response.json({ error: "Conversation too long." }, { status: 413 });
+  }
   const conversationText = messages
     .map((m) => `${m.role === "user" ? "对方" : "爬虫脑"}: ${m.content}`)
     .join("\n");

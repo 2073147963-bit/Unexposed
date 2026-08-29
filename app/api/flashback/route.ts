@@ -1,4 +1,5 @@
 import { isCloud, streamEvents, type LLMMessage } from "@/lib/ai/provider";
+import { FLASHBACK_LIMITS, clientIp, rateLimit, readJsonWithLimit } from "@/lib/api/guard";
 import { retrieve } from "@/lib/ai/retrieve";
 import { buildSystemPrompt, detectLanguage, getThought, type PhotoContext } from "@/lib/ai/style";
 
@@ -15,20 +16,34 @@ interface FlashbackRequest {
 }
 
 export async function POST(request: Request) {
-  let body: FlashbackRequest;
-  try {
-    body = (await request.json()) as FlashbackRequest;
-  } catch {
-    return Response.json({ error: "Invalid request body." }, { status: 400 });
+  // 服务端保护：IP 限流 + 每日额度（前端授权弹窗是体验提示，不是安全边界）。
+  const limited = rateLimit(clientIp(request), FLASHBACK_LIMITS);
+  if (!limited.ok) {
+    return Response.json(
+      { error: limited.message },
+      { status: 429, headers: { "Retry-After": String(limited.retryAfter ?? 60) } },
+    );
   }
+
+  const parsed = await readJsonWithLimit<FlashbackRequest>(request, 262_144);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.body;
 
   const { message, photoContext, history = [] } = body ?? {};
   if (typeof message !== "string" || !message.trim()) {
     return Response.json({ error: "A message is required." }, { status: 400 });
   }
-  // 请求体积上限：消息与上下文均为短文本，256KB 足够；防御异常超大请求。
-  if (JSON.stringify(body).length > 262_144) {
-    return Response.json({ error: "Request too large." }, { status: 413 });
+  if (message.length > 4000) {
+    return Response.json({ error: "Message too long (max 4000 chars)." }, { status: 413 });
+  }
+  if (!Array.isArray(history) || history.length > 40) {
+    return Response.json({ error: "Too many history entries." }, { status: 413 });
+  }
+  if (history.some((entry) => typeof entry?.content !== "string" || entry.content.length > 8000)) {
+    return Response.json({ error: "History entry too long." }, { status: 413 });
+  }
+  if (typeof photoContext?.description === "string" && photoContext.description.length > 8000) {
+    return Response.json({ error: "Photo context too long." }, { status: 413 });
   }
 
   const safePhotoContext: PhotoContext = {

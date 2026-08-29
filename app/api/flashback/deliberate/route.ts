@@ -1,5 +1,6 @@
 import { stream, type LLMMessage } from "@/lib/ai/provider";
 import { buildDeliberationPrompt, getThought, type PhotoContext } from "@/lib/ai/style";
+import { DELIBERATE_LIMITS, clientIp, rateLimit, readJsonWithLimit } from "@/lib/api/guard";
 
 interface DeliberateRequest {
   message: string;
@@ -11,12 +12,17 @@ interface DeliberateRequest {
 // 「出声思考」：正式回答前，三重脑就这句话的内心争执（流式）。与主回答并行，
 // 先到先显示，作为等待期的「思考层」。失败时前端静默降级，不影响主回答。
 export async function POST(request: Request) {
-  let body: DeliberateRequest;
-  try {
-    body = (await request.json()) as DeliberateRequest;
-  } catch {
-    return Response.json({ error: "Invalid request body." }, { status: 400 });
+  const limited = rateLimit(clientIp(request), DELIBERATE_LIMITS);
+  if (!limited.ok) {
+    return Response.json(
+      { error: limited.message },
+      { status: 429, headers: { "Retry-After": String(limited.retryAfter ?? 60) } },
+    );
   }
+
+  const parsed = await readJsonWithLimit<DeliberateRequest>(request, 65_536);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.body;
 
   const message = body?.message;
   if (typeof message !== "string" || !message.trim()) {
