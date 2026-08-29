@@ -4,6 +4,9 @@
 # Next.js build output
 /.next
 /out
+/.vinext
+/dist
+/.wrangler
 
 # local environment files
 .env*

@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "dev": "vinext dev",
+    "build": "vinext build",
+    "start": "vinext start"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.8",
@@ -19,6 +19,10 @@
     "three": "^0.185.1"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "1.37.1",
+    "@openai/sites-vite-plugin": "0.1.0",
+    "@vitejs/plugin-react": "6.0.2",
+    "@vitejs/plugin-rsc": "0.5.26",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/matter-js": "^0.20.2",
     "@types/node": "^26.3.0",
@@ -26,6 +30,13 @@
     "@types/react-dom": "^19.2.5",
     "@types/three": "^0.185.4",
     "tailwindcss": "^4.3.3",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "vinext": "1.0.0-beta.2",
+    "vite": "8.0.13",
+    "wrangler": "4.92.0"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
   }
 }
