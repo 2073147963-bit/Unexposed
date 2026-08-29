@@ -89,10 +89,10 @@ function pickVoiceFor(text: string, previous: string | undefined, thoughtTag: st
   return fallbacks[0] ?? thoughtTag;
 }
 
-// 内置要求句过滤：模型思考里常复述提示词约束（句数限制、迪斯科文体、问题收尾等），
+// 内置要求句过滤：模型思考里常复述提示词约束（句数限制、文体基准、问题收尾等），
 // 这些是指令的回声而非念头本身，不配上屏——面板只保留"几个思维在争执"的观感。
 const META_SENTENCE_RE =
-  /迪斯科|disco|提示词|指令|规则|要求|内置|prompt|instruction|guideline|requirement|\d+\s*[-–~]\s*\d+\s*(句|秒)|\d+\s*句|sentences?\b|收尾|end(ing)? with|第二人称|second person|星号|asterisk|文体|人设/i;
+  /提示词|指令|规则|要求|内置|prompt|instruction|guideline|requirement|\d+\s*[-–~]\s*\d+\s*(句|秒)|\d+\s*句|sentences?\b|收尾|end(ing)? with|第二人称|second person|星号|asterisk|文体|人设/i;
 
 function isMetaSentence(text: string): boolean {
   return META_SENTENCE_RE.test(text);
