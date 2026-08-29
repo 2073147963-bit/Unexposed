@@ -26,6 +26,10 @@ export async function POST(request: Request) {
   if (typeof message !== "string" || !message.trim()) {
     return Response.json({ error: "A message is required." }, { status: 400 });
   }
+  // 请求体积上限：消息与上下文均为短文本，256KB 足够；防御异常超大请求。
+  if (JSON.stringify(body).length > 262_144) {
+    return Response.json({ error: "Request too large." }, { status: 413 });
+  }
 
   const safePhotoContext: PhotoContext = {
     caption: photoContext?.caption ?? "",

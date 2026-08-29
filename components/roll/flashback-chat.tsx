@@ -7,6 +7,7 @@ import { useLanguage } from "@/components/ui/language-provider";
 import { THOUGHTS } from "@/lib/ai/style";
 import { appendPhotoCaption, getPhotoDescription, getPhotoOpening, getPhotoReflections, getRoll, saveConversation } from "@/lib/db";
 import { describePhoto, precomputeNextOpening, OPENING_PROMPT_VERSION } from "@/lib/describe-photo";
+import { ensureCloudAllowed } from "@/lib/ai/consent";
 import { randomId } from "@/lib/utils/random-id";
 import type { ConversationMessage, HistoricalPhotoMemory, Reflection } from "@/lib/types";
 
@@ -166,8 +167,10 @@ export function FlashbackChat({
       }
       // 3. 后台确保视觉描述就绪（无缓存则生成并缓存），完成后回填，供后续轮次接地。
       try {
-        const description = await describePhoto(photo.id, photo.imageBlob);
-        if (description) descriptionRef.current = description;
+        if (await ensureCloudAllowed()) {
+          const description = await describePhoto(photo.id, photo.imageBlob);
+          if (description) descriptionRef.current = description;
+        }
       } catch { /* 描述失败则保持无描述 */ }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -218,6 +221,11 @@ export function FlashbackChat({
     const trimmed = text.trim();
     if (!trimmed || streaming) return;
 
+    // 云端授权闸：用户选择「仅本地浏览」时不发送任何内容到云端服务。
+    if (!(await ensureCloudAllowed())) {
+      setError(language === "zh" ? "云端 AI 已在本会话停用（仅本地浏览）。" : "Cloud AI is disabled for this session (local only).");
+      return;
+    }
     const history = [...historyRef.current];
     if (!opts.hidden) {
       setMessages((current) => [...current, { role: "user", content: trimmed }]);

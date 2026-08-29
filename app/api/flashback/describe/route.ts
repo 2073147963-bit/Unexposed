@@ -18,6 +18,10 @@ export async function POST(request: Request) {
   if (typeof image !== "string" || !image) {
     return Response.json({ error: "An image is required." }, { status: 400 });
   }
+  // base64 体积上限 ≈ 16MB 原始图片：防御异常超大请求，保护内存与上游配额。
+  if (image.length > 16_000_000) {
+    return Response.json({ error: "Image too large." }, { status: 413 });
+  }
 
   const prompt = [
     "请客观描述这张照片：画面里有什么人、物、场景，大概的色调和氛围，以及你能辨认出的关键细节（文字、地点标志、时间线索等）。",

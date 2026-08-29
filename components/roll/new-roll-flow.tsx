@@ -15,7 +15,9 @@ import { useLanguage } from "@/components/ui/language-provider";
 import { useSound } from "@/components/sound/sound-provider";
 import { getActiveDraft, getSealedRolls, saveRoll, sealRollRecord } from "@/lib/db";
 import { precomputePhoto } from "@/lib/describe-photo";
+import { ensureCloudAllowed } from "@/lib/ai/consent";
 
+import { compressImage } from "@/lib/utils/image";
 import { randomId } from "@/lib/utils/random-id";
 import type { PhotoMemory, RollStep, StoredRoll } from "@/lib/types";
 
@@ -216,23 +218,28 @@ export function NewRollFlow() {
     if (validFiles.length > available) {
       setMessage(`Only ${available} more photo${available === 1 ? "" : "s"} can be added.`);
     }
-    const additions = validFiles.slice(0, available).map<PhotoMemory>((file, index) => ({
-      id: randomId(),
-      rollId: roll.id,
-      imageBlob: file,
-      createdAt: new Date(),
-      caption: "",
-      position: (roll.photos.length + index + 1) as 1 | 2 | 3,
-    }));
+    const additions = await Promise.all(
+      validFiles.slice(0, available).map(async (file, index): Promise<PhotoMemory> => ({
+        id: randomId(),
+        rollId: roll.id,
+        imageBlob: await compressImage(file),
+        createdAt: new Date(),
+        caption: "",
+        position: (roll.photos.length + index + 1) as 1 | 2 | 3,
+      })),
+    );
     if (additions.length) {
       await commit({ ...roll, photos: [...roll.photos, ...additions] });
       // 照片刚进来就后台预生成（视觉描述 + 开场独白）——从选照片到封存通常远超半分钟，
       // 等第一次点进闪回时缓存已就绪，直接呈现现成内容。失败静默，进场时会现场生成兜底。
-      for (const addition of additions) {
-        void precomputePhoto(
-          { id: addition.id, imageBlob: addition.imageBlob, caption: addition.caption, createdAt: addition.createdAt },
-          language,
-        ).catch(() => {});
+      // 云端模式下需用户已授权（会话级）；未授权则跳过，闪回时现场生成。
+      if (await ensureCloudAllowed()) {
+        for (const addition of additions) {
+          void precomputePhoto(
+            { id: addition.id, imageBlob: addition.imageBlob, caption: addition.caption, createdAt: addition.createdAt },
+            language,
+          ).catch(() => {});
+        }
       }
     }
   }
@@ -244,9 +251,10 @@ export function NewRollFlow() {
       setMessage("Only image files are accepted.");
       return;
     }
+    const imageBlob = await compressImage(file);
     const photos = roll.photos.map((photo) =>
       photo.id === photoId
-        ? { ...photo, imageBlob: file, createdAt: new Date() }
+        ? { ...photo, imageBlob, createdAt: new Date() }
         : photo,
     );
     await commit({ ...roll, photos });
