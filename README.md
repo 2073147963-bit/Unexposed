@@ -2,7 +2,7 @@
 
 > **把照片封存成胶卷，让今天的解释在未来重新显影。**
 
-[![在线体验](https://img.shields.io/badge/%E5%9C%A8%E7%BA%BF%E4%BD%93%E9%AA%8C-APP-2545FF)](https://unexposed-memory.windy-betta-8990.chatgpt.site)
+[![在线体验](https://img.shields.io/badge/%E5%9C%A8%E7%BA%BF%E4%BD%93%E9%AA%8C-APP-2545FF)](https://unexposed.vercel.app)
 [![演示视频](https://img.shields.io/badge/%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91-MP4-d6442e)](./deliverables/UNEXPOSED-demo.mp4)
 [![License: MIT](https://img.shields.io/badge/License-MIT-8d76a8)](./LICENSE)
 ![Topic: shenicest-fission](https://img.shields.io/badge/Topic-shenicest__fission-5C6BB0)
@@ -24,9 +24,9 @@ Unexposed 是一款本地优先的个人影像记忆应用。它不鼓励用户�
 - **Slogan：** 把照片封存成胶卷，让今天的解释在未来重新显影。
 - **GitHub 仓库：** https://github.com/2073147963-bit/Unexposed
 - **Topic：** `shenicest-fission`
-- **在线体验：** https://unexposed-memory.windy-betta-8990.chatgpt.site
+- **在线体验：** https://unexposed.vercel.app （公网版默认云端 GLM-5.3-Flash）
 - **演示视频：** [`deliverables/UNEXPOSED-demo.mp4`](./deliverables/UNEXPOSED-demo.mp4)（3 分 03 秒，1080p）
-- **团队成员与分工：** 待补充（单人参赛）
+- **团队成员与分工：** 独立开发者（1 人）——产品、视觉、前端、AI 与检索、测试与演示均由本人完成
 
 ## 作品描述
 
