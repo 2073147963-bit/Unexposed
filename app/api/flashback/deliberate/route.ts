@@ -1,10 +1,11 @@
 import { stream, type LLMMessage } from "@/lib/ai/provider";
-import { buildDeliberationPrompt, type PhotoContext } from "@/lib/ai/style";
+import { buildDeliberationPrompt, getThought, type PhotoContext } from "@/lib/ai/style";
 
 interface DeliberateRequest {
   message: string;
   photoContext?: PhotoContext;
   language?: "zh" | "en";
+  thoughtId?: string;
 }
 
 // 「出声思考」：正式回答前，三重脑就这句话的内心争执（流式）。与主回答并行，
@@ -32,6 +33,7 @@ export async function POST(request: Request) {
   const system = buildDeliberationPrompt({
     photoContext: safePhotoContext,
     language: body?.language === "en" ? "en" : "zh",
+    thought: getThought(body?.thoughtId),
   });
 
   const llmMessages: LLMMessage[] = [

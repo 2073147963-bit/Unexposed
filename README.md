@@ -13,9 +13,9 @@ Unexposed 是一款本地优先的个人影像记忆应用。它不鼓励用户�
 - **作品 Slogan：** 把照片封存成胶卷，让今天的解释在未来重新显影。
 - **作品形态：** 可运行的 Next.js Web 应用，桌面端优先，兼顾移动端与键盘操作
 - **GitHub Topic：** `shenicest-fission`（仓库发布后需在 GitHub 仓库设置中添加；Topic 本身不带 `#`）
-- **代码仓库：** 待创建或关联 GitHub 仓库。当前目录未检测到 Git 元数据，提交前必须补充公开或评审可访问的仓库链接。
-- **演示视频：** 已有脚本与可播放的网页分镜，正式视频文件及公开视频链接待录制后补充。
-- **在线体验：** 可选，部署后补充 URL。未配置云端 AI 时，建议在演示设备上运行本地 Ollama。
+- **代码仓库：** https://github.com/2073147963-bit/Unexposed （本目录，`main` 分支）
+- **演示视频：** 仓库内 `deliverables/UNEXPOSED-demo.mp4`（3 分 03 秒，1080p：三重脑开场 → 建卷与封存 → 闪回对话与多声部争执 → 对话归档）
+- **在线体验：** 本地运行 `pnpm install && pnpm dev` 后访问 `http://localhost:3000`；在 `.env.local` 配置智谱 `LLM_API_KEY` 即启用云端 GLM（未配置时核心封存流程仍可离线体验）。海外网络亦可访问 Vercel 部署：https://unexposed.vercel.app
 
 建议提交时将本节原样复制到报名表，再用真实链接和团队信息替换“待补充”项。
 

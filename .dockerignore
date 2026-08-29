@@ -1,0 +1,16 @@
+node_modules
+.next
+delete
+deploy
+github-submission
+*.zip
+*.png
+*.jpg
+*.html
+*.pdf
+*.docx
+.env.local
+.docx_render
+.test-assets
+example
+tsconfig.tsbuildinfo

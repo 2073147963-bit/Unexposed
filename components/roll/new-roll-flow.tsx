@@ -15,6 +15,8 @@ import { useLanguage } from "@/components/ui/language-provider";
 import { useSound } from "@/components/sound/sound-provider";
 import { getActiveDraft, getSealedRolls, saveRoll, sealRollRecord } from "@/lib/db";
 import { precomputePhoto } from "@/lib/describe-photo";
+
+import { randomId } from "@/lib/utils/random-id";
 import type { PhotoMemory, RollStep, StoredRoll } from "@/lib/types";
 
 const themes = [
@@ -27,7 +29,7 @@ const themes = [
 
 function makeRoll(title: string, theme: string): StoredRoll {
   return {
-    id: crypto.randomUUID(),
+    id: randomId(),
     title: title.trim(),
     theme,
     createdAt: new Date(),
@@ -215,7 +217,7 @@ export function NewRollFlow() {
       setMessage(`Only ${available} more photo${available === 1 ? "" : "s"} can be added.`);
     }
     const additions = validFiles.slice(0, available).map<PhotoMemory>((file, index) => ({
-      id: crypto.randomUUID(),
+      id: randomId(),
       rollId: roll.id,
       imageBlob: file,
       createdAt: new Date(),
@@ -224,6 +226,14 @@ export function NewRollFlow() {
     }));
     if (additions.length) {
       await commit({ ...roll, photos: [...roll.photos, ...additions] });
+      // 照片刚进来就后台预生成（视觉描述 + 开场独白）——从选照片到封存通常远超半分钟，
+      // 等第一次点进闪回时缓存已就绪，直接呈现现成内容。失败静默，进场时会现场生成兜底。
+      for (const addition of additions) {
+        void precomputePhoto(
+          { id: addition.id, imageBlob: addition.imageBlob, caption: addition.caption, createdAt: addition.createdAt },
+          language,
+        ).catch(() => {});
+      }
     }
   }
 

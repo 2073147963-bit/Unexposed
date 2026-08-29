@@ -2,8 +2,14 @@ import { complete } from "@/lib/ai/provider";
 import { buildSystemPrompt, type PhotoContext } from "@/lib/ai/style";
 
 interface OpeningRequest {
-  photoContext?: PhotoContext;
+  photoContext?: {
+    caption?: string;
+    reflections?: string[];
+    takenAt?: string;
+    description?: string;
+  };
   language?: "zh" | "en";
+  previousOpening?: string;
 }
 
 // 开场触发语：与语言包里的 flashbackOpening 保持一致。
@@ -25,12 +31,20 @@ export async function POST(request: Request) {
   const language: "zh" | "en" = body?.language === "en" ? "en" : "zh";
   const safePhotoContext: PhotoContext = {
     caption: body?.photoContext?.caption ?? "",
-    reflections: [],
+    reflections: Array.isArray(body?.photoContext?.reflections)
+      ? body.photoContext.reflections.filter((r): r is string => typeof r === "string")
+      : [],
     takenAt: body?.photoContext?.takenAt ?? "",
     description: typeof body?.photoContext?.description === "string" ? body.photoContext.description : "",
   };
 
-  const system = buildSystemPrompt({ photoContext: safePhotoContext, fragments: [], language, opening: true });
+  const system = buildSystemPrompt({
+    photoContext: safePhotoContext,
+    fragments: [],
+    language,
+    opening: true,
+    previousOpening: typeof body?.previousOpening === "string" ? body.previousOpening : undefined,
+  });
 
   let opening = "";
   try {
@@ -39,7 +53,7 @@ export async function POST(request: Request) {
         { role: "system", content: system },
         { role: "user", content: TRIGGER[language] },
       ],
-      { temperature: 0.9, topP: 0.9, maxTokens: 2000 },
+      { temperature: 0.9, topP: 0.9, maxTokens: 4000 },
     );
   } catch (err) {
     console.error("开场独白生成失败：", err);

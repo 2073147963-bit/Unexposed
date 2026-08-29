@@ -1,5 +1,6 @@
 import Dexie, { type EntityTable } from "dexie";
 
+import { randomId } from "@/lib/utils/random-id";
 import type { ConversationRecord, PhotoDescription, PhotoOpening, Reflection, RollVersion, StoredRoll } from "@/lib/types";
 
 class UnexposedDatabase extends Dexie {
@@ -124,7 +125,7 @@ export async function addDoubleExposure(photoId: string, content: string) {
   const trimmed = content.trim();
   if (!trimmed) throw new Error("A reflection cannot be empty.");
   const reflection: Reflection = {
-    id: crypto.randomUUID(),
+    id: randomId(),
     photoId,
     content: trimmed,
     createdAt: new Date(),
@@ -190,7 +191,7 @@ export async function appendPhotoCaption(rollId: string, photoId: string, additi
 
 function createSealedVersion(roll: StoredRoll, sealedAt: Date): RollVersion {
   return {
-    id: crypto.randomUUID(),
+    id: randomId(),
     rollId: roll.id,
     version: 1,
     kind: "sealed",

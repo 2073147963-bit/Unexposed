@@ -1319,6 +1319,8 @@ button {
 .flashback-seg-reptilian { color: #cdb3e0; }
 .flashback-seg-limbic { color: #c9a05a; }
 .flashback-seg-neocortex { color: #7fa8c9; }
+.flashback-seg-thought { color: #a68fd0; font-style: italic; }
+.flashback-seg-reasoning { color: #8d76a8; font-style: italic; font-size: 15px; line-height: 1.6; }
 .flashback-typing { color: #a06bd0; font: 17px/1.7 Georgia, serif; animation: flashback-blink 1.1s steps(2, start) infinite; }
 @keyframes flashback-blink { to { visibility: hidden; } }
 

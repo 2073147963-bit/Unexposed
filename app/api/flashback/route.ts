@@ -1,4 +1,4 @@
-import { isCloud, stream, type LLMMessage } from "@/lib/ai/provider";
+import { isCloud, streamEvents, type LLMMessage } from "@/lib/ai/provider";
 import { retrieve } from "@/lib/ai/retrieve";
 import { buildSystemPrompt, detectLanguage, getThought, type PhotoContext } from "@/lib/ai/style";
 
@@ -66,10 +66,10 @@ export async function POST(request: Request) {
     { role: "user", content: message },
   ];
 
-  // 3. 调用 Provider 流式生成（本地 Ollama 或云端 GLM，一套代码）。
+  // 3. 调用 Provider 流式生成（NDJSON 事件流：思考与正文都实时透传，前端边生成边呈现）。
   let streamBody: ReadableStream<Uint8Array>;
   try {
-    streamBody = await stream(llmMessages, { temperature: 0.9, topP: 0.9, maxTokens: 3000 });
+    streamBody = await streamEvents(llmMessages, { temperature: 0.9, topP: 0.9, maxTokens: 3000 });
   } catch (err) {
     console.error("模型调用失败：", err);
     return Response.json(

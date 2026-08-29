@@ -59,7 +59,7 @@ export async function describePhoto(photoId: string, imageBlob: Blob): Promise<s
 }
 
 // 开场提示词版本：改动 OPENING_SYSTEM_PROMPT 时 +1，版本不符的旧缓存会被重新生成。
-export const OPENING_PROMPT_VERSION = 2;
+export const OPENING_PROMPT_VERSION = 4;
 
 // 生成开场独白：有缓存（且语言、版本都匹配）直接返回，否则调云端并写回缓存。
 export async function generateOpening(
@@ -87,14 +87,36 @@ export async function generateOpening(
   return opening;
 }
 
+// 预生成「下一场」对话的开场：跳过缓存检查强制生成，并覆盖同一照片的旧开场缓存。
+// 在一场对话封存后后台调用——缓存里永远存着「下一场」的现成开场，下次点进闪回即秒开。
+export async function precomputeNextOpening(
+  photoId: string,
+  photoContext: PhotoContext,
+  language: "zh" | "en",
+  previousOpening: string,
+): Promise<void> {
+  const res = await fetch("/api/flashback/opening", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ photoContext, language, previousOpening }),
+  });
+  if (!res.ok) return;
+  const data = (await res.json().catch(() => null)) as { opening?: string } | null;
+  const opening = data?.opening?.trim() || "";
+  if (opening) {
+    await savePhotoOpening({ photoId, opening, language, version: OPENING_PROMPT_VERSION, createdAt: new Date() });
+  }
+}
+
 // 预计算一张照片的「事实底座」：视觉描述 + 开场独白，双双缓存后，闪回打开即可秒开。
 // 封存时 / 进入详情页时 fire-and-forget 调用；失败不影响主流程。
 export async function precomputePhoto(
   photo: { id: string; imageBlob: Blob; caption: string; createdAt: Date },
   language: "zh" | "en",
 ): Promise<void> {
-  const description = await describePhoto(photo.id, photo.imageBlob);
-  if (!description) return;
+  const description = await describePhoto(photo.id, photo.imageBlob).catch(() => "");
+  // 描述失败不阻塞开场独白的预生成：开场提示词对空描述自带「看不清」降级，
+  // 否则描述一旦失败，开场缓存永远不会就位，闪回只能现场生成（首字等待极长）。
   const locale = language === "zh" ? "zh-CN" : "en";
   const takenAt = new Intl.DateTimeFormat(locale, { dateStyle: "long" }).format(photo.createdAt);
   await generateOpening(

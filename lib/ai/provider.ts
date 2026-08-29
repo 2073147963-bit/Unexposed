@@ -87,13 +87,58 @@ export async function complete(
 ): Promise<string> {
   const res = await call(opts.model || CHAT_MODEL, messages, false, opts);
   const data = (await res.json().catch(() => null)) as {
-    choices?: Array<{ message?: { content?: string } }>;
+    choices?: Array<{ finish_reason?: string; message?: { content?: string } }>;
   } | null;
-  return data?.choices?.[0]?.message?.content?.trim() ?? "";
+  const content = data?.choices?.[0]?.message?.content?.trim() ?? "";
+  // 思考模型可能把 max_tokens 全部耗在推理上（finish_reason=length 且正文为空）。
+  // 加倍预算自动重试一次，消除随机性空回复。
+  if (!content && data?.choices?.[0]?.finish_reason === "length" && opts.maxTokens && opts.maxTokens < 8000) {
+    return complete(messages, { ...opts, maxTokens: opts.maxTokens * 2 });
+  }
+  return content;
 }
 
-// 流式补全：把 SSE 转成纯文本流（前端无需任何改动）。
+// 流式补全：把事件流转回纯文本流（只含正文，供争执等旧调用方使用）。
+// 注意：事件行可能被 TCP 分块从中间切断，必须跨块缓冲到完整行再解析，
+// 否则会随机丢弃半行文本（争执某句凭空缺一截）。
 export async function stream(
+  messages: LLMMessage[],
+  opts: Options & { model?: string } = {},
+): Promise<ReadableStream<Uint8Array>> {
+  const events = await streamEvents(messages, opts);
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder();
+  return new ReadableStream<Uint8Array>({
+    async start(controller) {
+      const reader = events.getReader();
+      let buffer = "";
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          let nl: number;
+          while ((nl = buffer.indexOf("\n")) >= 0) {
+            const line = buffer.slice(0, nl);
+            buffer = buffer.slice(nl + 1);
+            if (!line.trim()) continue;
+            try {
+              const event = JSON.parse(line) as { type?: string; text?: string };
+              if (event.type === "content" && event.text) controller.enqueue(encoder.encode(event.text));
+            } catch { /* 忽略不完整行 */ }
+          }
+        }
+      } finally {
+        controller.close();
+      }
+    },
+  });
+}
+
+// 流式补全（NDJSON 事件流）：思考模型的 reasoning_content 在正文前流式产出，
+// 若直接丢弃，前端会在首字前经历漫长空屏。这里把思考与正文都转成逐行 JSON 事件
+// （{"type":"reasoning"|"content","text":"..."}\n），让前端边生成边呈现两种流。
+export async function streamEvents(
   messages: LLMMessage[],
   opts: Options & { model?: string } = {},
 ): Promise<ReadableStream<Uint8Array>> {
@@ -104,6 +149,9 @@ export async function stream(
     async start(controller) {
       const reader = res.body!.getReader();
       let buffer = "";
+      const emit = (type: "reasoning" | "content", text: string) => {
+        controller.enqueue(encoder.encode(JSON.stringify({ type, text }) + "\n"));
+      };
       try {
         while (true) {
           const { done, value } = await reader.read();
@@ -117,9 +165,13 @@ export async function stream(
             const payload = line.slice(5).trim();
             if (payload === "[DONE]") return;
             try {
-              const parsed = JSON.parse(payload) as { choices?: Array<{ delta?: { content?: string } }> };
-              const delta = parsed?.choices?.[0]?.delta?.content;
-              if (typeof delta === "string" && delta) controller.enqueue(encoder.encode(delta));
+              const parsed = JSON.parse(payload) as {
+                choices?: Array<{ delta?: { content?: string; reasoning_content?: string; reasoning?: string } }>;
+              };
+              const delta = parsed?.choices?.[0]?.delta;
+              const reasoning = delta?.reasoning_content ?? delta?.reasoning;
+              if (typeof reasoning === "string" && reasoning) emit("reasoning", reasoning);
+              if (typeof delta?.content === "string" && delta.content) emit("content", delta.content);
             } catch {
               // 忽略无法解析的行（可能是 keep-alive 心跳等）。
             }
