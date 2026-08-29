@@ -198,6 +198,16 @@ Dockerfile / vercel.json / deploy/  部署配置与说明
 - 备份文件的加密与自动云同步（当前为手动导出 / 导入 JSON）。
 - 公网部署的严格 CSP，以及多实例部署下基于共享存储的限流与额度。
 
+## 验收记录
+
+验收日期：2026-08-29（提交前完善）。
+
+- **全新克隆验证**：从 GitHub `main` 最新重新克隆，`pnpm install --frozen-lockfile` → `pnpm typecheck` → `pnpm test`（5/5，备份往返 + 接口限流）→ `pnpm build` 全部通过。
+- **Docker 运行验证**：`docker build` 后运行，首页 HTTP 200；`GET /api/ai-status` 返回 `{"cloud":true,"model":"glm-5.3-flash"}`；`X-Content-Type-Options` / `X-Frame-Options` / `Referrer-Policy` / `Permissions-Policy` 响应头全部生效。
+- **备份往返测试**：创建 → 导出 → 清空 → 导入 → 重新打开胶卷，日期均为 `Date` 实例（`getFullYear` 正常）、照片 Blob 尺寸一致、封存版本快照完整；错误格式 / 不支持版本的导入被拒绝且不破坏现有数据。
+- **安全扫描**：全量 Git 历史与当前文件中无 `.env.local`、API Key、个人浏览器备份或未确认授权的语料 / 向量（初始提交的 `data/index.json` 即为空占位）。
+- **已上线能力**：云端授权弹窗（会话级）、AI 通道状态徽章、数据导出 / 导入 / 清空菜单、上传图片自动压缩、模型接口限流与每日额度、上游超时与错误脱敏。
+
 ---
 
 **一句话总结：** Unexposed 不替用户记住一切，而是帮助用户认真选择什么值得留下，并允许这份意义随时间重新显影。
