@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350" role="img" aria-labelledby="title desc">
+  <title id="title">Unexposed 路演海报模板</title>
+  <desc id="desc">深色复古胶片风格路演海报，包含三重脑、自我认知、爱与遗忘、核心流程和二维码占位。</desc>
+  <defs>
+    <radialGradient id="desk" cx="54%" cy="42%" r="74%">
+      <stop offset="0" stop-color="#32160f"/>
+      <stop offset="0.55" stop-color="#170a07"/>
+      <stop offset="1" stop-color="#050303"/>
+    </radialGradient>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#a69376"/>
+      <stop offset="0.16" stop-color="#ded4bd"/>
+      <stop offset="0.82" stop-color="#c7b99e"/>
+      <stop offset="1" stop-color="#72594a"/>
+    </linearGradient>
+    <filter id="grain" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="3" seed="17" result="noise"/>
+      <feColorMatrix in="noise" type="saturate" values="0" result="mono"/>
+      <feComponentTransfer in="mono" result="faint"><feFuncA type="table" tableValues="0 0.11"/></feComponentTransfer>
+      <feBlend in="SourceGraphic" in2="faint" mode="soft-light"/>
+    </filter>
+    <filter id="shadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="15"/>
+      <feOffset dy="18"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.72"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <pattern id="grid" width="180" height="180" patternUnits="userSpaceOnUse">
+      <path d="M180 0H0V180" fill="none" stroke="#7d4637" stroke-opacity="0.13" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1080" height="1350" fill="#050303"/>
+  <rect x="36" y="36" width="1008" height="1278" rx="2" fill="url(#desk)"/>
+  <rect x="36" y="36" width="1008" height="1278" fill="url(#grid)"/>
+  <rect x="36" y="36" width="1008" height="1278" filter="url(#grain)" fill="transparent"/>
+
+  <!-- Editable event metadata -->
+  <g fill="#9c4837" font-family="Courier New, monospace" font-size="14" letter-spacing="4">
+    <text x="76" y="86">[ EVENT / 2026 ]</text>
+    <text x="1004" y="86" text-anchor="end">[ TEAM NAME ]</text>
+  </g>
+
+  <!-- Brand title -->
+  <text x="72" y="188" fill="#eee7d9" font-family="Arial Narrow, Arial, sans-serif" font-size="92" font-weight="800" letter-spacing="8">UNEXPOSED</text>
+  <text x="78" y="234" fill="#b82d1e" font-family="Courier New, monospace" font-size="25" letter-spacing="13">未显影</text>
+  <line x1="76" y1="272" x2="1004" y2="272" stroke="#6d2c21" stroke-width="2"/>
+
+  <!-- Core proposition -->
+  <text x="78" y="344" fill="#d7cbb5" font-family="Georgia, serif" font-size="34">很多人明明还活着，</text>
+  <text x="78" y="393" fill="#d7cbb5" font-family="Georgia, serif" font-size="34">重要的记忆却已经开始消失。</text>
+  <text x="78" y="448" fill="#8e776a" font-family="Georgia, serif" font-size="20">关于自我认知、爱与遗忘的个人影像产品</text>
+
+  <!-- Triple brain dialogue -->
+  <g transform="translate(76 510)">
+    <rect width="928" height="250" fill="#090504" stroke="#4a1c15"/>
+    <line x1="309" y1="0" x2="309" y2="250" stroke="#32150f"/>
+    <line x1="619" y1="0" x2="619" y2="250" stroke="#32150f"/>
+
+    <g transform="translate(24 28)">
+      <text fill="#b82d1e" font-family="Courier New, monospace" font-size="13" letter-spacing="2">爬虫脑 / 叔本华</text>
+      <text y="42" fill="#eee7d9" font-family="Georgia, serif" font-size="24">遗忘使你</text>
+      <text y="74" fill="#eee7d9" font-family="Georgia, serif" font-size="24">继续活下去。</text>
+      <text y="122" fill="#7f6458" font-family="Georgia, serif" font-size="16">本能 · 疼痛 · 生存</text>
+      <text y="170" fill="#6d2c21" font-family="Courier New, monospace" font-size="11">WHAT MUST BE FORGOTTEN?</text>
+    </g>
+
+    <g transform="translate(333 28)">
+      <text fill="#c39152" font-family="Courier New, monospace" font-size="13" letter-spacing="2">哺乳脑 / 克尔凯郭尔</text>
+      <text y="42" fill="#eee7d9" font-family="Georgia, serif" font-size="24">爱使你仍然</text>
+      <text y="74" fill="#eee7d9" font-family="Georgia, serif" font-size="24">愿意回头。</text>
+      <text y="122" fill="#7f6458" font-family="Georgia, serif" font-size="16">依恋 · 焦虑 · 选择</text>
+      <text y="170" fill="#76552e" font-family="Courier New, monospace" font-size="11">WHO DO YOU STILL CARRY?</text>
+    </g>
+
+    <g transform="translate(643 28)">
+      <text fill="#839cac" font-family="Courier New, monospace" font-size="13" letter-spacing="2">新皮层 / 尼采</text>
+      <text y="42" fill="#eee7d9" font-family="Georgia, serif" font-size="24">意义来自</text>
+      <text y="74" fill="#eee7d9" font-family="Georgia, serif" font-size="24">主动选择。</text>
+      <text y="122" fill="#7f6458" font-family="Georgia, serif" font-size="16">判断 · 遗忘 · 创造</text>
+      <text y="170" fill="#425d6b" font-family="Courier New, monospace" font-size="11">WHAT WILL YOU CHOOSE?</text>
+    </g>
+  </g>
+
+  <!-- Film strip / three-step product mechanism -->
+  <g transform="translate(76 812)" filter="url(#shadow)">
+    <rect width="718" height="246" rx="3" fill="#070707" stroke="#3f1510" stroke-width="2"/>
+    <path d="M0 22H718M0 224H718" stroke="#6b2a20" stroke-width="2" stroke-dasharray="12 14"/>
+    <g transform="translate(24 47)">
+      <g>
+        <rect width="202" height="152" fill="url(#paper)"/>
+        <text x="14" y="26" fill="#3c1a13" font-family="Courier New, monospace" font-size="13">01 / CHOOSE</text>
+        <text x="101" y="83" text-anchor="middle" fill="#160b08" font-family="Arial Narrow, Arial" font-weight="800" font-size="33">选择</text>
+        <text x="101" y="115" text-anchor="middle" fill="#5d4639" font-family="Georgia, serif" font-size="15">只留下真正重要的</text>
+      </g>
+      <g transform="translate(234)">
+        <rect width="202" height="152" fill="#a83625"/>
+        <text x="14" y="26" fill="#2b0905" font-family="Courier New, monospace" font-size="13">02 / SEAL</text>
+        <text x="101" y="83" text-anchor="middle" fill="#f2dfc9" font-family="Arial Narrow, Arial" font-weight="800" font-size="33">封存</text>
+        <text x="101" y="115" text-anchor="middle" fill="#e0b09d" font-family="Georgia, serif" font-size="15">过去不可被覆盖</text>
+      </g>
+      <g transform="translate(468)">
+        <rect width="202" height="152" fill="#14242c"/>
+        <text x="14" y="26" fill="#839cac" font-family="Courier New, monospace" font-size="13">03 / RE-DEVELOP</text>
+        <text x="101" y="83" text-anchor="middle" fill="#d9e2df" font-family="Arial Narrow, Arial" font-weight="800" font-size="30">再显影</text>
+        <text x="101" y="115" text-anchor="middle" fill="#93a4a5" font-family="Georgia, serif" font-size="15">看见自我如何变化</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- QR / call to action placeholder -->
+  <g transform="translate(830 812)">
+    <rect width="174" height="174" fill="#d7cbb5"/>
+    <rect x="18" y="18" width="42" height="42" fill="none" stroke="#160b08" stroke-width="9"/>
+    <rect x="114" y="18" width="42" height="42" fill="none" stroke="#160b08" stroke-width="9"/>
+    <rect x="18" y="114" width="42" height="42" fill="none" stroke="#160b08" stroke-width="9"/>
+    <path d="M84 20h12v28H84zm-12 54h24v12H72zm40 4h16v48h-16zm-36 34h22v44H76zm32 22h48v22h-48z" fill="#160b08"/>
+    <text x="87" y="204" text-anchor="middle" fill="#9c4837" font-family="Courier New, monospace" font-size="11" letter-spacing="2">[ REPLACE WITH QR ]</text>
+  </g>
+
+  <!-- Closing line -->
+  <text x="76" y="1133" fill="#eee7d9" font-family="Georgia, serif" font-size="30">你不需要保存全部。</text>
+  <text x="76" y="1180" fill="#f04a23" font-family="Arial Narrow, Arial" font-size="48" font-weight="800" letter-spacing="3">先选择三个。</text>
+  <text x="76" y="1240" fill="#8e776a" font-family="Courier New, monospace" font-size="14" letter-spacing="3">MEMORY CAN CHANGE. HISTORY SHOULD REMAIN.</text>
+
+  <!-- Editable footer -->
+  <line x1="76" y1="1274" x2="1004" y2="1274" stroke="#4a1c15"/>
+  <g fill="#7a3b30" font-family="Courier New, monospace" font-size="12" letter-spacing="2">
+    <text x="76" y="1302">[ DATE ]  ·  [ VENUE ]</text>
+    <text x="1004" y="1302" text-anchor="end">[ WEBSITE / CONTACT ]</text>
+  </g>
+</svg>

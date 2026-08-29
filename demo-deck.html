@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>未显影 UNEXPOSED · 路演演示概念稿（5 min / 9 页）</title>
+<style>
+  :root{
+    --ink:#080504; --panel:#120706; --red:#d6442e; --orange:#f04a23;
+    --paper:#e9dfc6; --dim:#8e776a; --gold:#c9a05a; --blue:#7fa8c9; --purple:#cdb3e0;
+    --mono:"Courier New",Consolas,ui-monospace,monospace;
+    --sans:"Arial Narrow","Roboto Condensed",Arial,"PingFang SC","Microsoft YaHei",sans-serif;
+    --serif:Georgia,"Songti SC",SimSun,serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{background:#030202;color:var(--paper);font-family:var(--sans);overflow:hidden;cursor:pointer}
+
+  .stage{position:fixed;inset:0;display:grid;place-items:center;padding:2.4vh}
+  .deck{position:relative;width:min(96vw,calc(94vh * 16 / 9));aspect-ratio:16/9;background:var(--ink);
+    box-shadow:0 0 0 1px rgba(214,68,46,.3),0 30px 90px rgba(0,0,0,.85);overflow:hidden}
+  .deck::before{content:"";position:absolute;inset:0;z-index:40;pointer-events:none;opacity:.13;mix-blend-mode:soft-light;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E")}
+
+  .slide{position:absolute;inset:0;padding:5.2% 6%;display:none;flex-direction:column;z-index:5}
+  .slide.on{display:flex;animation:slide-in .45s cubic-bezier(.22,1,.36,1)}
+  @keyframes slide-in{from{opacity:0;transform:translateY(10px)}}
+
+  .meta{font-family:var(--mono);font-size:clamp(8px,1.3vw,12px);letter-spacing:.3em;color:var(--red);text-transform:uppercase}
+  .h-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4.5%}
+  h1{font-size:clamp(26px,5.6vw,58px);font-weight:900;letter-spacing:-.02em;line-height:1.08;text-transform:uppercase}
+  h1 em{font-style:normal;font-weight:300;color:var(--orange)}
+  .sub{margin-top:1.8%;font-family:var(--serif);font-size:clamp(11px,1.9vw,19px);color:var(--dim);line-height:1.8}
+  .body{flex:1;display:flex;flex-direction:column;justify-content:center}
+  .foot{display:flex;justify-content:space-between;align-items:baseline;
+    font-family:var(--mono);font-size:clamp(7px,1.1vw,10px);letter-spacing:.2em;color:var(--dim);text-transform:uppercase}
+  .foot b{color:var(--red)}
+
+  .big{font-family:var(--serif);font-size:clamp(24px,4.6vw,50px);line-height:1.5;font-weight:400}
+  .big em{font-style:normal;color:var(--orange)}
+  .big .strike{text-decoration:line-through;text-decoration-color:var(--red);text-decoration-thickness:3px;color:var(--dim)}
+
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:4%;width:100%}
+  .card{border:1px solid rgba(214,68,46,.3);background:var(--panel);padding:5% 5.5%}
+  .card .k{font-family:var(--mono);font-size:clamp(7px,1.2vw,11px);letter-spacing:.24em;color:var(--orange);text-transform:uppercase}
+  .card .v{margin-top:3.5%;font-size:clamp(11px,1.9vw,19px);line-height:1.65}
+  .card .v i{font-style:normal;color:var(--dim);font-size:.82em}
+  .card.hl{border-color:var(--orange);box-shadow:8px 9px 0 rgba(0,0,0,.6)}
+
+  .live{align-self:center;text-align:center}
+  .live .word{font-size:clamp(40px,9vw,96px);font-weight:900;letter-spacing:.06em;color:var(--orange);
+    text-transform:uppercase;animation:pulse 1.6s ease-in-out infinite}
+  @keyframes pulse{50%{opacity:.55}}
+  .live .cue{margin-top:3%;font-family:var(--mono);font-size:clamp(9px,1.5vw,14px);letter-spacing:.16em;color:var(--paper);line-height:2.1;text-align:left;display:inline-block}
+  .live .cue b{color:var(--orange)}
+
+  .chat{width:min(72%,640px);margin:0 auto;border:1px solid #2a1633;background:linear-gradient(160deg,#0c0710,#0a050e 70%);
+    box-shadow:10px 12px 0 rgba(0,0,0,.6);padding:0 0 4%}
+  .chat .head{display:flex;align-items:center;gap:8px;padding:3.5% 5%;border-bottom:1px solid #22102b}
+  .chat .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 9px var(--gold)}
+  .chat .head b{color:var(--paper);font-size:clamp(9px,1.5vw,14px);letter-spacing:.06em}
+  .chat .head small{color:rgba(201,160,90,.55);font-family:var(--mono);font-size:clamp(6px,1vw,9px);letter-spacing:.14em}
+  .chat .msgs{padding:4% 5%;display:flex;flex-direction:column;gap:9%}
+  .chat .seg{font-family:var(--serif);font-size:clamp(9px,1.6vw,15px);line-height:1.75;color:var(--gold)}
+  .chat .tag{display:block;font-family:var(--mono);font-size:clamp(6px,.9vw,9px);letter-spacing:.2em;opacity:.7;margin-bottom:2px}
+  .chat .rep{color:var(--purple)}
+  .chat .neo{color:var(--blue)}
+  .chat .user{align-self:flex-end;max-width:70%;background:#1d2a33;color:#cfe0e8;padding:1.8% 3.4%;border-radius:10px 10px 2px 10px;
+    font-family:var(--serif);font-size:clamp(9px,1.5vw,14px)}
+
+  .stack{display:grid;grid-template-columns:repeat(4,1fr);gap:3%;width:100%}
+  .arch{display:flex;flex-direction:column;gap:5%;width:100%}
+  .arch .lane{display:flex;align-items:center;gap:3%;border:1px dashed rgba(214,68,46,.4);padding:2.6% 4%}
+  .arch .lane .t{font-family:var(--mono);font-size:clamp(7px,1.2vw,11px);letter-spacing:.18em;color:var(--dim)}
+  .arch .lane b{color:var(--paper);font-size:clamp(9px,1.6vw,15px);font-weight:700}
+
+  .qr-row{display:flex;align-items:center;gap:4%;justify-content:center;margin-top:4%}
+  .qr{width:clamp(50px,9vh,84px);aspect-ratio:1;outline:3px solid var(--paper);outline-offset:3px;
+    background:repeating-linear-gradient(0deg,var(--paper) 0 8.3%,transparent 8.3% 16.6%),repeating-linear-gradient(90deg,var(--paper) 0 8.3%,#1a0d0a 8.3% 16.6%,var(--paper) 16.6% 25%)}
+  .qr-t{font-family:var(--mono);font-size:clamp(8px,1.3vw,12px);letter-spacing:.2em;line-height:2;color:var(--paper);text-align:left}
+
+  .hint{position:fixed;bottom:12px;left:0;right:0;text-align:center;font-family:var(--mono);
+    font-size:10px;letter-spacing:.18em;color:rgba(142,119,106,.6);z-index:60;pointer-events:none}
+  .counter{position:fixed;top:14px;right:20px;font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--dim);z-index:60}
+
+  @media (max-width:760px){.cols{grid-template-columns:1fr}.stack{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+  <div class="counter" id="counter">1 / 9</div>
+  <div class="stage"><div class="deck" id="deck">
+
+    <!-- 1 封面 -->
+    <section class="slide on">
+      <div class="body" style="align-items:center;text-align:center">
+        <p class="meta">UNEXPOSED · 未显影 — SHE NICEST 2026 烈变 · 软件应用赛道「滴水穿石」</p>
+        <h1 style="margin-top:3%">用<em>胶卷</em>，而不是相册</h1>
+        <p class="sub" style="margin-top:2.5%">「封存那些还没死、却快被遗忘的。」</p>
+        <p class="sub" style="margin-top:5%;font-family:var(--mono);font-size:clamp(8px,1.3vw,12px);letter-spacing:.24em">团队：______ · 成员：______ · 2026.08.30 DEMO DAY</p>
+      </div>
+      <div class="foot"><span>UNEXPOSED</span><span><b>01</b> / 09</span></div>
+    </section>
+
+    <!-- 2 问题 -->
+    <section class="slide">
+      <div class="h-head"><p class="meta">问题 · PROBLEM</p><p class="meta">问题洞察与价值 15%</p></div>
+      <div class="body">
+        <p class="big">手机里躺着 <em>30,000</em> 张照片。<br/>去年，你回看过<span class="strike">几</span> <em>张</em>？</p>
+        <p class="sub" style="margin-top:4%">相册不是记忆的容器，是记忆的<b style="color:var(--red)">掩埋场</b>——成千上万张照片彼此遮蔽，直到没有一张仍然重要。</p>
+      </div>
+      <div class="foot"><span>为谁解决什么问题：被相册淹没、再也不回看的人</span><span><b>02</b> / 09</span></div>
+    </section>
+
+    <!-- 3 方案 -->
+    <section class="slide">
+      <div class="h-head"><p class="meta">方案 · THE ROLL</p><p class="meta">创新性 20%</p></div>
+      <div class="body">
+        <p class="sub" style="margin-bottom:4%">三个声音在开场只给你一句话：<span style="color:var(--paper)">「三个，足够构成一段记忆，也少到让你无法逃避选择。」</span></p>
+        <div class="cols">
+          <div class="card"><p class="k">03 EXP · 三张限制</p><p class="v">一卷只能装三张照片——<i>选择本身就是纪念</i></p></div>
+          <div class="card"><p class="k">SEALED · 封存不可改</p><p class="v">封存后成为历史记录，<i>重新反思以「双重曝光」叠加，从不覆盖</i></p></div>
+          <div class="card"><p class="k">RE-DEVELOP · 重新显影</p><p class="v">多年后写下「现在」——<i>THEN 2019 / NOW 2026 同屏对照</i></p></div>
+          <div class="card hl"><p class="k">FLASHBACK · 闪回</p><p class="v">对照片说话，三重脑陪你回忆——<i>AI 不替你回忆</i></p></div>
+        </div>
+      </div>
+      <div class="foot"><span>AI 原生 · 记忆的显影液，不是囤积的仓库</span><span><b>03</b> / 09</span></div>
+    </section>
+
+    <!-- 4 LIVE DEMO -->
+    <section class="slide">
+      <div class="body live">
+        <p class="word">LIVE DEMO</p>
+        <p class="cue" style="margin-top:4%">
+          <b>01</b>&nbsp; 桌面拖罐碰撞 → 点击「那年夏天 2019」<br/>
+          <b>02</b>&nbsp; 胶片展开 → 双击放大 2019 年的说明<br/>
+          <b>03</b>&nbsp; 重新显影 → 写下 2026 → THEN/NOW 对照<br/>
+          <b>04</b>&nbsp; 闪回 → 说一句真话 → 封存 → 摘要写回<br/>
+          <b>05</b>&nbsp; 对话记录 → 存档
+        </p>
+      </div>
+      <div class="foot"><span>≈ 2 分 30 秒 · 兜底：90 秒录屏视频（断网即放）</span><span><b>04</b> / 09</span></div>
+    </section>
+
+    <!-- 5 闪回 -->
+    <section class="slide">
+      <div class="h-head"><p class="meta">闪回 · 三重脑</p><p class="meta">技术能力 20% · AI 原生</p></div>
+      <div class="body" style="align-items:center">
+        <div class="chat">
+          <div class="head"><span class="dot"></span><b>哺乳脑</b><small>LIMBIC BRAIN · 你的心，从胸腔说话</small></div>
+          <div class="msgs">
+            <p class="seg">你把这张底片压了七年。海的味道你还记得吗？还是只记得「记得」这件事本身？</p>
+            <p class="seg rep"><span class="tag">[[爬虫脑]]</span>它替你忘。它替你活。</p>
+            <p class="user">那天她穿了条白裙子。</p>
+            <p class="seg neo"><span class="tag">[[新皮层]]</span>记忆不是录像带，是每一次显影时重新做的决定。</p>
+            <p class="seg">看，你先想起的是裙子的颜色，不是日期。那天之后，你们还见过吗？</p>
+          </div>
+        </div>
+        <p class="sub" style="margin-top:3.5%;text-align:center;font-size:clamp(8px,1.4vw,13px)">主声音 = 哺乳脑（情绪与依恋）· 爬虫脑 / 新皮层辅助插话 · 思维阁 + 风格语料检索（RAG）· 流式生成</p>
+      </div>
+      <div class="foot"><span>对话可封存 → 摘要写回照片说明，成为下一次回忆的底座</span><span><b>05</b> / 09</span></div>
+    </section>
+
+    <!-- 6 技术 -->
+    <section class="slide">
+      <div class="h-head"><p class="meta">技术 · ARCHITECTURE</p><p class="meta">稳定性 · 数据安全</p></div>
+      <div class="body">
+        <div class="stack" style="margin-bottom:4.5%">
+          <div class="card"><p class="k">NEXT.JS 16</p><p class="v">App Router <i>· 流式 SSE</i></p></div>
+          <div class="card"><p class="k">THREE.JS + MATTER-JS</p><p class="v">3D 物理桌面 <i>· 罐体碰撞仿真</i></p></div>
+          <div class="card"><p class="k">GLM-5.3-FLASH</p><p class="v">多模态单模型 <i>· 读图 + 对话 + 提炼</i></p></div>
+          <div class="card"><p class="k">DEXIE / INDEXEDDB</p><p class="v">照片永不离开本机 <i>· 零上传</i></p></div>
+        </div>
+        <div class="arch">
+          <div class="lane"><b>云端</b><span class="t">智谱 GLM-5.3-Flash —— 日常路径，多模态一个模型通吃</span></div>
+          <div class="lane"><b>本地</b><span class="t">Ollama qwen2.5 + qwen2.5-vl —— 断网自动降级，同一套代码零改动</span></div>
+        </div>
+      </div>
+      <div class="foot"><span>缓存预热：封存即预生成描述与开场 → 闪回秒开</span><span><b>06</b> / 09</span></div>
+    </section>
+
+    <!-- 7 人文价值 -->
+    <section class="slide">
+      <div class="h-head"><p class="meta">人文价值 · WHY</p><p class="meta">技术是工具，人文价值是灵魂</p></div>
+      <div class="body">
+        <p class="big" style="font-size:clamp(20px,3.8vw,42px)">「不保存全部。<br/>全部，是另一种形式的<em>遗忘</em>。」</p>
+        <p class="sub" style="margin-top:4%">记忆是一种劳动，大多数时候由女性默默承担——家庭相册、孩子的第一次、聚会的唯一合影。<br/>未显影把这件劳动重新变成一次<b style="color:var(--orange)">郑重的选择</b>：少，但都是你亲手留下的。</p>
+      </div>
+      <div class="foot"><span>隐私即立场：记忆不该被平台托管</span><span><b>07</b> / 09</span></div>
+    </section>
+
+    <!-- 8 后续 -->
+    <section class="slide">
+      <div class="h-head"><p class="meta">后续计划 · NEXT</p><p class="meta">后续发展潜力 10%</p></div>
+      <div class="body">
+        <div class="cols">
+          <div class="card"><p class="k">双语 · I18N</p><p class="v">中英全量支持已就绪，<i>面向海外家庭记忆场景</i></p></div>
+          <div class="card"><p class="k">共卷 · FAMILY ROLL</p><p class="v">多人合卷：同一卷里，<i>每个人留下自己的一张与一句</i></p></div>
+          <div class="card"><p class="k">实体 · PRINT</p><p class="v">胶卷显影为实体小卡与罐装纪念，<i>数字记忆落回纸面</i></p></div>
+          <div class="card"><p class="k">周年 · ECHO</p><p class="v">封存满一年后提醒「重新显影」——<i>让对照随时间生长</i></p></div>
+        </div>
+      </div>
+      <div class="foot"><span>可迭代：从 Demo 到产品的路径清晰（提交文档附路线图）</span><span><b>08</b> / 09</span></div>
+    </section>
+
+    <!-- 9 结尾 -->
+    <section class="slide">
+      <div class="body" style="align-items:center;text-align:center">
+        <p class="meta">UNEXPOSED · 未显影</p>
+        <p class="big" style="margin-top:4%">死亡不是终点，<em>遗忘才是</em>。</p>
+        <div class="qr-row">
+          <div class="qr"></div>
+          <p class="qr-t">现场试玩<br/>SCAN TO DEVELOP</p>
+        </div>
+      </div>
+      <div class="foot"><span>谢谢 · 问答时间</span><span><b>09</b> / 09</span></div>
+    </section>
+
+  </div></div>
+  <p class="hint">← → 方向键 / 点击翻页 · 每页底部为讲者提示（终稿不投影该行可删）</p>
+
+<script>
+  const slides = [...document.querySelectorAll(".slide")];
+  let i = 0;
+  function go(n) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach((s, k) => s.classList.toggle("on", k === i));
+    document.getElementById("counter").textContent = (i + 1) + " / " + slides.length;
+  }
+  window.addEventListener("keydown", e => {
+    if (["ArrowRight","ArrowDown"," ","PageDown","Enter"].includes(e.key)) { e.preventDefault(); go(i + 1); }
+    if (["ArrowLeft","ArrowUp","PageUp"].includes(e.key)) { e.preventDefault(); go(i - 1); }
+  });
+  document.getElementById("deck").addEventListener("click", () => go(i + 1));
+  go(0);
+</script>
+</body>
+</html>

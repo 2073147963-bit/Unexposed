@@ -1,0 +1,17 @@
+# dependencies
+/node_modules
+
+# Next.js build output
+/.next
+/out
+
+# local environment files
+.env*
+
+# logs
+*.log
+
+# TypeScript
+*.tsbuildinfo
+
+# Public submission contains a deliberately empty, redistributable RAG index.

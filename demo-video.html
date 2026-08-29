@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>未显影 UNEXPOSED · Demo 视频（HTML 分镜版 · 2:04）</title>
+<style>
+  :root{
+    --yellow:#F7A600; --blue:#3B5BE4; --indigo:#5C6BB0; --orange:#F0541E; --btn:#2545FF;
+    --ink:#161616; --paper:#F3EDDD; --cap:#141414;
+    --ink2:#080504; --red:#d6442e; --orange2:#f04a23; --gold:#c9a05a; --purple:#cdb3e0; --neo:#7fa8c9;
+    --s-red:#D5451B; --s-green:#3E7C59; --s-gold:#E3A428; --s-gray:#8C8C8C;
+    --sans:"Helvetica Neue",Helvetica,Arial,"PingFang SC","Microsoft YaHei",sans-serif;
+    --serif:Georgia,"Songti SC",SimSun,serif;
+    --mono:"Courier New",Consolas,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#030202;font-family:var(--sans);height:100vh;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:12px;padding:14px}
+
+  .player{position:relative;width:min(96vw,calc(88vh * 16 / 9));aspect-ratio:16/9;background:var(--ink2);
+    box-shadow:0 0 0 1px rgba(243,237,221,.15),0 30px 90px rgba(0,0,0,.9);overflow:hidden;cursor:pointer}
+
+  /* ===== 分镜 ===== */
+  .shot{position:absolute;inset:0;display:none;padding:5% 6%}
+  .shot.live{display:flex;flex-direction:column;animation:cut .5s cubic-bezier(.22,1,.36,1)}
+  @keyframes cut{from{opacity:0;transform:scale(1.02)}}
+
+  .giant{font-weight:700;letter-spacing:-.02em;line-height:.95}
+  .giant em{font-style:normal;font-weight:300}
+  .vo-anim{opacity:0;transform:translateY(14px)}
+  .live .vo-anim{animation:up .7s cubic-bezier(.22,1,.36,1) forwards}
+  @keyframes up{to{opacity:1;transform:none}}
+  .d1{animation-delay:.15s!important}.d2{animation-delay:.45s!important}.d3{animation-delay:.75s!important}
+  .d4{animation-delay:1.1s!important}.d5{animation-delay:1.5s!important}.d6{animation-delay:1.9s!important}
+
+  /* 色场镜头 */
+  .s-yellow{background:var(--yellow);color:var(--ink)}
+  .s-blue{background:var(--blue);color:#fff}
+  .s-indigo{background:var(--indigo);color:#fff}
+  .s-orange{background:var(--orange);color:#fff}
+  .s-dark{background:var(--ink2);color:var(--paper)}
+  .shot .meta{font-family:var(--mono);font-size:clamp(8px,1.2vw,13px);letter-spacing:.32em;text-transform:uppercase;opacity:.75}
+  .s-yellow .meta{color:var(--ink)}
+  .g1{font-size:clamp(38px,9.5vw,100px);margin-top:auto}
+  .g2{font-size:clamp(52px,13vw,140px);margin:auto 0}
+  .num{color:var(--yellow)}
+  .subcap{margin-top:3%;font-size:clamp(10px,1.9vw,19px);line-height:1.8;max-width:60%;opacity:.85}
+
+  /* App 屏幕录制镜头（暗房风） */
+  .screen{flex:1;margin-top:2.5%;border:1px solid rgba(214,68,46,.35);background:radial-gradient(circle at 50% 20%,#160705,#050202 75%);
+    position:relative;overflow:hidden;display:flex;flex-direction:column}
+  .screen .chrome{display:flex;gap:6px;padding:8px 12px;border-bottom:1px solid rgba(214,68,46,.25);align-items:center}
+  .screen .chrome i{width:8px;height:8px;border-radius:50%;background:#5a2320}
+  .screen .chrome span{font-family:var(--mono);font-size:clamp(6px,1vw,9px);letter-spacing:.2em;color:var(--red);margin-left:8px}
+
+  /* S4 桌面 */
+  .desk{flex:1;position:relative;background:
+    linear-gradient(90deg,rgba(197,105,72,.06) 1px,transparent 1px),
+    linear-gradient(rgba(197,105,72,.06) 1px,transparent 1px),#23150f}
+  .mini-can{position:absolute;width:13%;aspect-ratio:88/172;display:grid;grid-template-rows:20fr 132fr 20fr;
+    transform:translate(-50%,-50%) rotate(var(--r,0deg))}
+  .mini-can i{display:block;width:calc(100% + 10px);margin-left:-5px;background:var(--cap)}
+  .mini-can .label{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8%;
+    border-left:7px solid var(--st);border-right:7px solid var(--st);background:var(--paper);color:var(--ink)}
+  .mini-can .label b{font-size:clamp(10px,2.4vw,20px);font-weight:900;letter-spacing:-.05em}
+  .mini-can .label .t{font-weight:700;font-size:clamp(6px,1.3vw,11px)}
+  .live .floaty{animation:floaty 5s ease-in-out infinite}
+  @keyframes floaty{50%{transform:translate(-50%,-56%) rotate(var(--r,0deg))}}
+  .desk .brandmark{position:absolute;top:4%;left:3%;font-family:var(--mono);font-size:clamp(6px,1.1vw,10px);letter-spacing:.2em;color:#fff;opacity:.8}
+
+  /* S5 胶片 */
+  .filmwrap{flex:1;display:flex;align-items:center;justify-content:center;gap:3%;background:#080504}
+  .film{display:flex;gap:2.4%;background:#1a0806;padding:3.2% 2.6%;position:relative;box-shadow:12px 14px 0 rgba(0,0,0,.7);
+    width:78%}
+  .film::before,.film::after{content:"";position:absolute;left:2%;right:2%;height:9%;
+    background:repeating-linear-gradient(90deg,#070302 0 10px,transparent 10px 22px)}
+  .film::before{top:3%}.film::after{bottom:3%}
+  .fr{flex:1;aspect-ratio:4/3;background:#2a0c08;padding:2.2%;position:relative;overflow:hidden}
+  .fr img{width:100%;height:100%;object-fit:cover;filter:sepia(.25) contrast(1.05) saturate(.75) brightness(.9)}
+  /* 版权安全：不用真实照片，CSS 绘制「未显影」底片格 */
+  .fr.neg{background:
+    radial-gradient(circle at 62% 38%, rgba(233,223,198,.32), transparent 46%),
+    radial-gradient(circle at 30% 72%, rgba(214,68,46,.35), transparent 52%),
+    linear-gradient(158deg,#3a1410,#1c0806 62%,#260d09)}
+  .fr.neg .no{position:absolute;top:6%;left:7%;font-family:var(--mono);font-size:clamp(5px,.9vw,9px);letter-spacing:.22em;color:var(--orange2)}
+  .fr.neg .code{position:absolute;bottom:6%;right:7%;font-family:var(--mono);font-size:clamp(4.5px,.8vw,8px);letter-spacing:.16em;color:rgba(233,223,198,.4)}
+  .fr.neg::after{content:"";position:absolute;inset:12%;border:1px solid rgba(233,223,198,.16)}
+  .live .film .fr{opacity:0;transform:translateX(-40px);animation:feed .7s cubic-bezier(.22,1,.36,1) forwards}
+  .live .film .fr:nth-child(2){animation-delay:.35s}.live .film .fr:nth-child(3){animation-delay:.7s}
+  .live .film .fr:nth-child(4){animation-delay:1.05s}
+  @keyframes feed{to{opacity:1;transform:none}}
+  .thenlab{position:absolute;top:-14%;left:0;font-family:var(--mono);font-size:clamp(7px,1.3vw,12px);letter-spacing:.26em;color:var(--orange2)}
+
+  /* S6 THEN/NOW */
+  .tn{flex:1;display:flex;gap:4%;align-items:center;justify-content:center;background:#080504}
+  .tn .col{width:36%;border:1px solid rgba(214,68,46,.35);background:#120706;padding:2.6%}
+  .tn .col .k{font-family:var(--mono);font-size:clamp(7px,1.2vw,11px);letter-spacing:.24em;color:var(--red)}
+  .tn .col p{font-family:var(--serif);font-size:clamp(10px,1.9vw,18px);line-height:1.7;color:#e9dbc9;margin-top:6%}
+  .tn .col.now{border-color:var(--orange2);box-shadow:8px 9px 0 rgba(0,0,0,.6)}
+  .live .tn .col.now{animation:nowin .6s cubic-bezier(.22,1,.36,1) 1.2s both}
+  @keyframes nowin{from{opacity:0;transform:translateY(16px)}}
+
+  /* S7 闪回聊天 */
+  .chatbg{flex:1;background:#0c0710;display:flex;align-items:center;justify-content:center}
+  .chat{width:64%;border:1px solid #2a1633;background:linear-gradient(160deg,#0c0710,#0a050e 70%);padding-bottom:2%}
+  .chat .head{display:flex;align-items:center;gap:8px;padding:2.6% 4%;border-bottom:1px solid #22102b}
+  .chat .dot{width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold)}
+  .chat .head b{color:#c9a2e6;font-size:clamp(9px,1.6vw,15px)}
+  .chat .head small{color:rgba(160,107,208,.55);font-family:var(--mono);font-size:clamp(6px,1vw,9px);letter-spacing:.16em}
+  .chat .msgs{padding:4%;display:flex;flex-direction:column;gap:3%}
+  .chat .b{opacity:0;font-family:var(--serif);font-size:clamp(9px,1.7vw,16px);line-height:1.75;color:var(--gold)}
+  .live .chat .b{animation:bup .6s cubic-bezier(.22,1,.36,1) forwards}
+  .live .chat .b:nth-child(2){animation-delay:1.8s}.live .chat .b:nth-child(3){animation-delay:3.6s}
+  .live .chat .b:nth-child(4){animation-delay:5.4s}.live .chat .b:nth-child(5){animation-delay:7.6s}
+  @keyframes bup{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .chat .b .tag{display:block;font-family:var(--mono);font-size:clamp(6px,.9vw,9px);letter-spacing:.2em;opacity:.7;margin-bottom:3px}
+  .chat .b.rep{color:var(--purple)}.chat .b.neo{color:var(--neo)}
+  .chat .b.user{align-self:flex-end;max-width:70%;background:#1d2a33;color:#cfe0e8;padding:2% 3.4%;border-radius:10px 10px 2px 10px}
+
+  /* S8 三重脑 */
+  .brains{flex:1;display:flex;flex-direction:column;justify-content:center;gap:3.5%;background:var(--paper);color:var(--ink);padding:4% 6%}
+  .brow{display:flex;align-items:center;gap:3%;border:2px solid var(--ink);padding:2.4% 3.4%;background:#fff}
+  .brow .nm{font-weight:900;font-size:clamp(12px,2.6vw,24px);width:26%}
+  .brow .nm i{display:block;font-style:normal;font-family:var(--mono);font-weight:400;font-size:.55em;letter-spacing:.12em;opacity:.6}
+  .brow p{font-size:clamp(9px,1.8vw,17px);line-height:1.6;opacity:.85}
+  .brow .role{font-family:var(--mono);font-size:clamp(7px,1.2vw,11px);letter-spacing:.14em;border:1.5px solid var(--ink);padding:2px 8px;margin-left:auto;white-space:nowrap}
+  .brow.main{background:var(--ink);color:var(--paper)}
+  .brow.main .role{border-color:var(--paper)}
+  .live .brow{opacity:0;transform:translateY(16px);animation:up .6s cubic-bezier(.22,1,.36,1) forwards}
+  .live .brow:nth-child(2){animation-delay:.4s}.live .brow:nth-child(3){animation-delay:.8s}.live .brow:nth-child(4){animation-delay:1.2s}
+  .thoughts{display:flex;gap:1.6%;flex-wrap:wrap}
+  .thoughts span{font-family:var(--mono);font-size:clamp(6px,1.2vw,11px);letter-spacing:.1em;border:1.5px solid var(--ink);
+    padding:.8% 1.6%;opacity:0}
+  .live .thoughts span{animation:chipin .4s ease forwards}
+  .live .thoughts span:nth-child(1){animation-delay:1.7s}.live .thoughts span:nth-child(2){animation-delay:2s}
+  .live .thoughts span:nth-child(3){animation-delay:2.3s}.live .thoughts span:nth-child(4){animation-delay:2.6s}
+  .live .thoughts span:nth-child(5){animation-delay:2.9s}.live .thoughts span:nth-child(6){animation-delay:3.2s}
+  .live .thoughts span:nth-child(2){background:var(--ink);color:var(--paper)}
+  @keyframes chipin{from{opacity:0}to{opacity:1}}
+
+  /* S9 运行模式 */
+  .pipe{flex:1;display:flex;flex-direction:column;justify-content:center;gap:4%;background:var(--ink2)}
+  .step{display:flex;align-items:center;gap:3%;border-left:5px solid var(--red);padding:1.8% 3%;background:#120706}
+  .step .no{font-family:var(--mono);font-size:clamp(9px,1.6vw,15px);color:var(--red);letter-spacing:.1em}
+  .step .t{font-size:clamp(10px,2vw,19px);font-weight:700}
+  .step .d{margin-left:auto;font-size:clamp(8px,1.4vw,13px);color:#8e776a;font-family:var(--mono);letter-spacing:.06em}
+  .live .step{opacity:0;transform:translateX(-20px);animation:sin .5s cubic-bezier(.22,1,.36,1) forwards}
+  .live .step:nth-child(1){animation-delay:.2s}.live .step:nth-child(2){animation-delay:.9s}
+  .live .step:nth-child(3){animation-delay:1.6s}.live .step:nth-child(4){animation-delay:2.3s}
+  .live .step:nth-child(5){animation-delay:3s}.live .step:nth-child(6){animation-delay:3.7s}
+  @keyframes sin{to{opacity:1;transform:none}}
+
+  /* S10 数据安全 */
+  .safe{flex:1;display:flex;align-items:center;gap:5%;background:#0b0504}
+  .safe .zero{font-size:clamp(60px,15vw,160px);font-weight:900;letter-spacing:-.04em;color:var(--orange2);line-height:.9}
+  .safe .zero small{display:block;font-family:var(--mono);font-size:clamp(8px,1.5vw,14px);letter-spacing:.3em;color:var(--paper);margin-top:4%}
+  .safe .lanes{display:flex;flex-direction:column;gap:4%;flex:1}
+  .safe .lane{border:1px dashed rgba(214,68,46,.45);padding:3.4% 4%}
+  .safe .lane b{font-size:clamp(10px,1.9vw,18px)}
+  .safe .lane p{font-family:var(--mono);font-size:clamp(7px,1.2vw,12px);letter-spacing:.08em;color:#8e776a;margin-top:1.5%}
+
+  /* S11 三命题 */
+  .props{flex:1;display:flex;gap:3%;align-items:stretch;background:var(--ink2)}
+  .prop{flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding:4% 3.4%;color:#fff;opacity:0;transform:translateY(24px)}
+  .live .prop{animation:up .6s cubic-bezier(.22,1,.36,1) forwards}
+  .live .prop:nth-child(1){animation-delay:.3s}.live .prop:nth-child(2){animation-delay:.8s}.live .prop:nth-child(3){animation-delay:1.3s}
+  .prop.ea{background:var(--blue)} .prop.sa{background:var(--indigo)} .prop.li{background:var(--orange)}
+  .prop .en{font-size:clamp(16px,3.4vw,34px);font-weight:700;letter-spacing:-.02em}
+  .prop .en em{font-style:normal;font-weight:300}
+  .prop .t{font-family:var(--mono);font-size:clamp(6px,1.1vw,10px);letter-spacing:.2em;margin-top:6%;opacity:.85}
+  .prop p{font-size:clamp(8px,1.5vw,14px);line-height:1.7;margin-top:8%;opacity:.92}
+
+  /* S12 结尾 */
+  .ending{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3.5%;background:var(--yellow);color:var(--ink);text-align:center}
+  .ending .brand{font-family:var(--mono);letter-spacing:.5em;font-size:clamp(8px,1.4vw,13px)}
+  .ending .big{font-family:var(--serif);font-size:clamp(18px,3.8vw,38px)}
+  .ending .qr{width:clamp(40px,8vh,70px);aspect-ratio:1;outline:3px solid var(--ink);outline-offset:3px;
+    background:repeating-linear-gradient(0deg,var(--ink) 0 8.3%,transparent 8.3% 16.6%),repeating-linear-gradient(90deg,var(--ink) 0 8.3%,var(--yellow) 8.3% 16.6%,var(--ink) 16.6% 25%)}
+
+  /* ===== 字幕（画面外下方，绝不遮挡） & 控件 ===== */
+  .captionstrip{width:min(96vw,calc(88vh * 16 / 9));min-height:46px;display:flex;align-items:center;justify-content:center}
+  .captionstrip p{font-family:var(--serif);color:#e9dbc9;font-size:clamp(12px,1.7vw,18px);letter-spacing:.02em;
+    text-align:center;line-height:1.6;background:rgba(243,237,221,.07);border:1px solid rgba(243,237,221,.14);
+    padding:.55em 1.3em;max-width:100%}
+  .controls{width:min(96vw,calc(88vh * 16 / 9));display:flex;flex-direction:column;gap:6px}
+  .bar{position:relative;height:18px;cursor:pointer}
+  .bar .track{position:absolute;top:7px;left:0;right:0;height:4px;background:rgba(243,237,221,.16)}
+  .bar .fill{position:absolute;top:7px;left:0;height:4px;background:var(--red);width:0%}
+  .bar .tick{position:absolute;top:4px;width:2px;height:10px;background:rgba(243,237,221,.4)}
+  .bar .chap{position:absolute;top:22px;font-family:var(--mono);font-size:8.5px;letter-spacing:.06em;color:rgba(243,237,221,.42);white-space:nowrap;transform:translateX(-50%)}
+  .row{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:rgba(243,237,221,.6)}
+  .row .btns{display:flex;gap:8px}
+  .row button{font:inherit;color:var(--paper);background:none;border:1px solid rgba(243,237,221,.35);padding:4px 10px;cursor:pointer}
+  .row button:hover{border-color:var(--paper)}
+
+  /* ===== 分镜表 ===== */
+  .board-overlay{position:fixed;inset:0;z-index:90;background:rgba(3,2,2,.96);display:none;padding:4vh 5vw;overflow:auto}
+  .board-overlay.on{display:block}
+  .board-overlay h2{font-family:var(--mono);font-size:13px;letter-spacing:.3em;color:var(--red);margin-bottom:14px}
+  .board-overlay table{width:100%;border-collapse:collapse;font-size:12px;color:#d8d0bd}
+  .board-overlay th{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:#8e776a;text-align:left;
+    border-bottom:1px solid rgba(214,68,46,.4);padding:8px 10px}
+  .board-overlay td{border-bottom:1px solid rgba(243,237,221,.08);padding:9px 10px;vertical-align:top;line-height:1.7}
+  .board-overlay td:first-child{font-family:var(--mono);color:var(--red)}
+  .board-overlay .close{position:fixed;top:16px;right:22px;font:16px var(--mono);color:var(--paper);background:none;border:1px solid rgba(243,237,221,.4);padding:6px 12px;cursor:pointer}
+</style>
+</head>
+<body>
+
+  <div class="player" id="player">
+
+    <!-- S1 -->
+    <section class="shot s-yellow" data-dur="7" data-title="开场" data-sub="我们用胶卷，而不是相册，保存记忆。" data-note="色场快切 + 品牌字；BGM 起低频脉冲">
+      <p class="meta">unexposed · 未显影 — 桌面档案</p>
+      <h1 class="giant g1 vo-anim d1">keep <em>&amp;</em> forget</h1>
+    </section>
+
+    <!-- S2 -->
+    <section class="shot s-blue" data-dur="9" data-title="问题" data-sub="手机里躺着三万张照片。去年，你回看过几张？" data-note="数字滚动放大；心跳音效">
+      <p class="meta">the problem · 相册是记忆的掩埋场</p>
+      <h1 class="giant g2 vo-anim d1"><span class="num">30,000</span> 张照片</h1>
+      <p class="subcap vo-anim d3">成千上万张照片彼此遮蔽，直到没有一张仍然重要。</p>
+    </section>
+
+    <!-- S3 -->
+    <section class="shot s-indigo" data-dur="7" data-title="规则" data-sub="每卷恰好三张照片——选择，本身就是纪念。" data-note="03 EXP 数字砸入">
+      <p class="meta">the rule · 三个声音只给你三张</p>
+      <h1 class="giant g2 vo-anim d1">03 <em>&amp;</em> 3 lines</h1>
+      <p class="subcap vo-anim d3">三张照片，三句当时愿意留下的话。</p>
+    </section>
+
+    <!-- S4 -->
+    <section class="shot s-dark" data-dur="11" data-title="桌面" data-sub="拖动胶卷罐，它们会真实地碰撞。点开一卷，记忆展开。" data-note="屏幕录制风格：物理桌面，罐体碰撞；拖拽音效">
+      <div class="screen">
+        <div class="chrome"><i></i><i></i><i></i><span>LIVE APP · UNEXPOSED</span></div>
+        <div class="desk">
+          <p class="brandmark">UNEXPOSED / TABLE · 03 卷已封存</p>
+          <div class="mini-can floaty" style="left:26%;top:38%;--r:-5deg;--st:var(--s-red)"><i></i><div class="label"><b>400</b><span class="t">那年夏天</span></div><i></i></div>
+          <div class="mini-can floaty" style="left:52%;top:56%;--r:3deg;--st:var(--s-green);animation-delay:.8s"><i></i><div class="label"><b>400</b><span class="t">外婆的旧屋</span></div><i></i></div>
+          <div class="mini-can floaty" style="left:74%;top:36%;--r:7deg;--st:var(--s-gold);animation-delay:1.6s"><i></i><div class="label"><b>400</b><span class="t">深夜便利店</span></div><i></i></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- S5 -->
+    <section class="shot s-dark" data-dur="9" data-title="封存·展开" data-sub="封存后不可覆盖——这是 2019 年的你，留下的原话。" data-note="胶片逐格喂入；走片音效">
+      <div class="filmwrap">
+        <div class="film">
+          <p class="thenlab">THEN — 2019 · 那年夏天</p>
+          <div class="fr neg"><span class="no">EXP 01</span><span class="code">FLM-A7</span></div>
+          <div class="fr neg"><span class="no">EXP 02</span><span class="code">FLM-B2</span></div>
+          <div class="fr neg"><span class="no">EXP 03</span><span class="code">FLM-C9</span></div>
+          <div class="fr" style="display:grid;place-items:center;background:#1e1e1e"><span style="font-family:var(--mono);font-size:clamp(6px,1vw,9px);letter-spacing:.2em;color:#6f6f6f">C–41</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- S6 -->
+    <section class="shot s-dark" data-dur="11" data-title="重新显影" data-sub="多年后写下「现在」——THEN 2019 与 NOW 2026，同屏对照。" data-note="左格先亮，NOW 卡延迟入场；快门声">
+      <div class="tn">
+        <div class="col"><p class="k">THEN — 2019</p><p>海风把裙摆吹起来的那一秒，我其实没敢看镜头。</p></div>
+        <div class="col now"><p class="k" style="color:var(--orange2)">NOW — 2026 · 重新显影</p><p>现在再看，她已经不在这个城市了。海风还在。</p></div>
+      </div>
+    </section>
+
+    <!-- S7 -->
+    <section class="shot s-dark" data-dur="15" data-title="闪回对话" data-sub="对照片说话——哺乳脑陪你回忆。AI 不替你回忆。" data-note="聊天气泡逐条浮现；模型真实输出录屏替换位">
+      <div class="chatbg">
+        <div class="chat">
+          <div class="head"><span class="dot"></span><b>哺乳脑</b><small>LIMBIC BRAIN · 你的心，从胸腔说话</small></div>
+          <div class="msgs">
+            <p class="b">你把这张底片压了七年。海的味道你还记得吗——还是只记得「记得」这件事本身？</p>
+            <p class="b rep"><span class="tag">[[爬虫脑]]</span>它替你忘。它替你活。</p>
+            <p class="b user">那天她穿了条白裙子。</p>
+            <p class="b neo"><span class="tag">[[新皮层]]</span>记忆不是录像带，是每一次显影时重新做的决定。</p>
+            <p class="b">看，你先想起的是裙子的颜色，不是日期。那天之后，你们还见过吗？</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- S8 -->
+    <section class="shot" data-dur="13" data-title="三重脑×思维阁" data-sub="主声哺乳脑，爬虫脑与新皮层辅助插话；思维阁每次随机点亮一枚立场镜片。" data-note="纸底信息卡；chip 逐枚点亮">
+      <div class="brains">
+        <div class="brow main"><div class="nm">哺乳脑<i>LIMBIC BRAIN</i></div><p>主声音 · 从胸腔说话：情绪、依恋、爱与失去，温热、一针见血。</p><span class="role">MAIN</span></div>
+        <div class="brow"><div class="nm">爬虫脑<i>REPTILIAN BRAIN</i></div><p>辅助 · 从脊髓尽头：本能、恐惧、生存，低沉干冷，护着人。</p><span class="role">AUX</span></div>
+        <div class="brow"><div class="nm">新皮层<i>NEOCORTEX</i></div><p>辅助 · 从头颅高处：冷静客观，像旁观者一样拆解。</p><span class="role">AUX</span></div>
+        <div class="thoughts">
+          <span>显影者 THE DEVELOPER</span><span class="lit2">定影者 THE FIXER</span><span>重曝者 THE DOUBLE-EXPOSURE</span>
+          <span>放大者 THE ENLARGER</span><span>裁剪者 THE CROPPER</span><span>烧片者 THE BURNER</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- S9 -->
+    <section class="shot" data-dur="12" data-title="运行模式" data-sub="封存即预热——描述与开场已缓存，闪回打开秒出第一句。" data-note="管线逐条点亮；打字机声">
+      <div class="pipe">
+        <div class="step"><span class="no">01</span><span class="t">封存即预热</span><span class="d">视觉描述 + 开场独白，后台预生成</span></div>
+        <div class="step"><span class="no">02</span><span class="t">开场独白秒开</span><span class="d">缓存命中，零等待</span></div>
+        <div class="step"><span class="no">03</span><span class="t">视觉读图 = 事实底座</span><span class="d">GLM-5.3-Flash 多模态，不编造画面</span></div>
+        <div class="step"><span class="no">04</span><span class="t">风格语料检索 RAG</span><span class="d">bge-m3 本地向量，top-3 注入语感</span></div>
+        <div class="step"><span class="no">05</span><span class="t">三脑争执流</span><span class="d">可见的「内心争执」，未定型的念头</span></div>
+        <div class="step"><span class="no">06</span><span class="t">主声作答 → 封存写回</span><span class="d">对话提炼摘要，写回照片说明</span></div>
+      </div>
+    </section>
+
+    <!-- S10 -->
+    <section class="shot" data-dur="9" data-title="数据安全" data-sub="照片永不离开设备；断网自动降级本地模型。" data-note="0 UPLOADS 大字；低音收束">
+      <div class="safe">
+        <h1 class="zero vo-anim d1">0<small>UPLOADS · 照片不出本机</small></h1>
+        <div class="lanes">
+          <div class="lane vo-anim d2"><b>云端 · 智谱 GLM-5.3-Flash</b><p>日常路径 · 多模态一个模型通吃（读图 + 对话 + 提炼）</p></div>
+          <div class="lane vo-anim d4"><b>本地 · Ollama qwen2.5 / qwen2.5-vl</b><p>断网自动降级 · 同一套代码零改动 · 路演现场双保险</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- S11 -->
+    <section class="shot" data-dur="13" data-title="三命题" data-sub="同一个未显影，三个为「她」与日常而生的回答。" data-note="三色卡依次竖起">
+      <div class="props">
+        <div class="prop ea"><p class="en">her <em>&amp;</em> you</p><p class="t">命题 eazo · 她创所爱 为你而造</p><p>给妈妈的一卷、女儿长大的三张——以前没人替「她」做过这样的记忆 App。</p></div>
+        <div class="prop sa"><p class="en">near <em>&amp;</em> dear</p><p class="t">命题 萨福 · 爱与生俱来 AI 唤醒本能</p><p>先与自己相处，才能看见他人。闪回的每一问，都从身体的感官出发。</p></div>
+        <div class="prop li"><p class="en">meh <em>&amp;</em> magic</p><p class="t">命题 LiberLive · 好日子 Hack the Ordinary</p><p>一顿普通的晚餐也值得被显影。每月一卷日常，把凑合的日子过成好日子。</p></div>
+      </div>
+    </section>
+
+    <!-- S12 -->
+    <section class="shot" data-dur="8" data-title="结尾" data-sub="死亡不是终点，遗忘才是。未显影。" data-note="回到柯达黄；QR 定格">
+      <div class="ending">
+        <p class="brand">U N E X P O S E D · 未显影</p>
+        <p class="big">「死亡不是终点，遗忘才是。」</p>
+        <div class="qr"></div>
+      </div>
+    </section>
+
+    <div class="subbar" style="display:none"><p id="subtitle"></p></div>
+  </div>
+
+  <div class="captionstrip"><p id="subtitle-out"></p></div>
+
+  <div class="controls">
+    <div class="bar" id="bar"><div class="track"></div><div class="fill" id="fill"></div></div>
+    <div class="row">
+      <span id="time">00:00 / 02:04</span>
+      <span id="chaplabel"></span>
+      <div class="btns">
+        <button id="btn-play">播放 ▶</button>
+        <button id="btn-board">分镜表 ▤</button>
+        <button id="btn-restart">重播 ↺</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="board-overlay" id="board">
+    <button class="close" onclick="toggleBoard(false)">关闭 ESC</button>
+    <h2>分镜表 · STORYBOARD（导出视频拍摄脚本 · 总长 2:04 · 1080p 16:9）</h2>
+    <table id="board-table"></table>
+  </div>
+
+<script>
+  const player = document.getElementById("player");
+  const shots = [...document.querySelectorAll(".shot")];
+  const fill = document.getElementById("fill");
+  const bar = document.getElementById("bar");
+  const sub = document.getElementById("subtitle");
+  const timeEl = document.getElementById("time");
+  const chapEl = document.getElementById("chaplabel");
+  const boardEl = document.getElementById("board");
+
+  const starts = []; let total = 0;
+  shots.forEach(s => { starts.push(total); total += Number(s.dataset.dur); });
+
+  // 时间轴刻度 + 分镜表
+  const barChaps = [];
+  shots.forEach((s, i) => {
+    const tick = document.createElement("div");
+    tick.className = "tick"; tick.style.left = (starts[i] / total * 100) + "%";
+    bar.appendChild(tick);
+    const row = document.createElement("tr");
+    const mm = n => String(Math.floor(n / 60)).padStart(2, "0") + ":" + String(Math.floor(n % 60)).padStart(2, "0");
+    row.innerHTML = `<td>SH ${String(i + 1).padStart(2, "0")}</td><td>${mm(starts[i])}–${mm(starts[i] + Number(s.dataset.dur))}（${s.dataset.dur}s）</td>
+      <td><b>${s.dataset.title}</b><br/>${s.dataset.note || ""}</td><td>${s.dataset.sub}</td>`;
+    document.querySelector("#board-table").appendChild(row);
+    barChaps.push(tick);
+  });
+
+  let cur = -1, t = 0, playing = false, raf = 0, last = 0, ended = false;
+  const fmt = n => String(Math.floor(n / 60)).padStart(2, "0") + ":" + String(Math.floor(n % 60)).padStart(2, "0");
+
+  function activate(i) {
+    if (i === cur) return;
+    cur = i;
+    shots.forEach((s, k) => s.classList.toggle("live", k === i));
+    sub.textContent = shots[i].dataset.sub || "";
+    document.getElementById("subtitle-out").textContent = shots[i].dataset.sub || "";
+    chapEl.textContent = `SH ${String(i + 1).padStart(2, "0")} · ${shots[i].dataset.title}`;
+  }
+  function frame(ts) {
+    if (!playing) return;
+    const dt = Math.min(0.1, (ts - last) / 1000); last = ts;
+    t += dt;
+    if (t >= total) { t = total; playing = false; ended = true; document.getElementById("btn-play").textContent = "重播 ↺"; }
+    let i = 0; while (i < shots.length - 1 && t >= starts[i + 1]) i++;
+    activate(i);
+    fill.style.width = (t / total * 100) + "%";
+    timeEl.textContent = fmt(t) + " / " + fmt(total);
+    if (playing) raf = requestAnimationFrame(frame);
+  }
+  function play() {
+    if (ended) { t = 0; ended = false; document.getElementById("btn-play").textContent = "暂停 ❚❚"; }
+    playing = true; last = performance.now();
+    document.getElementById("btn-play").textContent = "暂停 ❚❚";
+    cancelAnimationFrame(raf); raf = requestAnimationFrame(frame);
+  }
+  function pause() { playing = false; document.getElementById("btn-play").textContent = "播放 ▶"; }
+  function seekTo(i) { t = starts[i]; ended = false; activate(i); fill.style.width = (t / total * 100) + "%"; if (!playing) play(); }
+
+  function toggleBoard(force) {
+    boardEl.classList.toggle("on", force);
+    if (boardEl.classList.contains("on")) pause();
+  }
+
+  player.addEventListener("click", () => playing ? pause() : play());
+  document.getElementById("btn-play").addEventListener("click", e => { e.stopPropagation(); playing ? pause() : play(); });
+  document.getElementById("btn-restart").addEventListener("click", e => { e.stopPropagation(); seekTo(0); });
+  document.getElementById("btn-board").addEventListener("click", e => { e.stopPropagation(); toggleBoard(true); });
+  boardEl.querySelector(".close").addEventListener("click", () => toggleBoard(false));
+  bar.addEventListener("click", e => {
+    e.stopPropagation();
+    const x = (e.clientX - bar.getBoundingClientRect().left) / bar.offsetWidth;
+    let best = 0; starts.forEach((s, i) => { if (x * total >= s - 0.001) best = i; });
+    seekTo(best);
+  });
+  window.addEventListener("keydown", e => {
+    if (e.key === " ") { e.preventDefault(); playing ? pause() : play(); }
+    if (e.key === "ArrowRight") seekTo(Math.min(shots.length - 1, cur + 1));
+    if (e.key === "ArrowLeft") seekTo(Math.max(0, cur - 1));
+    if (e.key === "Escape") toggleBoard(false);
+    if (e.key.toLowerCase() === "b") toggleBoard(!boardEl.classList.contains("on"));
+  });
+
+  // 初始：第一帧 + 大播放状态
+  activate(0);
+  sub.textContent = shots[0].dataset.sub;
+  timeEl.textContent = "00:00 / " + fmt(total);
+</script>
+</body>
+</html>
