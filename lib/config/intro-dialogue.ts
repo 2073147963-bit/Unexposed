@@ -4,7 +4,7 @@
 
 export const INTRO_DIALOGUE_KEY = "introDialogueSeen";
 export const INTRO_DIALOGUE_VERSION_KEY = "introDialogueVersion";
-export const INTRO_DIALOGUE_VERSION = "triune-brain-v2";
+export const INTRO_DIALOGUE_VERSION = "triune-brain-v3";
 
 export type IntroBrain = "reptilian" | "limbic" | "neocortex";
 
